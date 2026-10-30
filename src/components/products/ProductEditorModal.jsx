@@ -244,7 +244,7 @@ export function ProductEditorModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#FAF9F6] border border-[#132333]/20 w-full max-w-4xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
+      <div className="bg-[#FAF9F6] border border-[#132333]/20 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
         {/* Header */}
         <div className="bg-[#071522] text-white px-6 py-4 flex items-center justify-between border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">

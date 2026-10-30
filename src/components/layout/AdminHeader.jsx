@@ -20,7 +20,7 @@ export function AdminHeader({
   const sitemapUrl = `${defaultBackendUrl}/sitemap.xml`;
   return (
     <header className="bg-[#071522] text-white border-b border-white/10 sticky top-0 z-40 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div className="max-w-[1820px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         {/* Left Branding */}
         <div className="flex items-center gap-3">
           <span className="w-2.5 h-2.5 rounded-full bg-[#A77C3A] animate-pulse" />

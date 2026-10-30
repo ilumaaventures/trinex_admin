@@ -126,7 +126,7 @@ export function ProductTable({ products, categories = [], onEdit, onDelete, onTo
                   </td>
 
                   {/* Description */}
-                  <td className="py-3.5 px-4 max-w-xs text-[#68717A] line-clamp-2 leading-relaxed">
+                  <td className="py-3.5 px-4 max-w-md xl:max-w-xl text-[#68717A] line-clamp-2 leading-relaxed">
                     {product.description}
                   </td>
 
