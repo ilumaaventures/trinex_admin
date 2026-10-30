@@ -45,6 +45,10 @@ export default function App() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState(null);
 
+  // In-flight visibility toggle tracking (prevents rapid double-click race conditions)
+  const [togglingCategoryIds, setTogglingCategoryIds] = useState(() => new Set());
+  const [togglingProductIds, setTogglingProductIds] = useState(() => new Set());
+
   // Toast state
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -169,48 +173,100 @@ export default function App() {
   };
 
   const handleToggleProductVisibility = async (id, partNumber, currentHidden) => {
+    const key = String(id);
+    if (togglingProductIds.has(key)) return;
+
+    setTogglingProductIds((prev) => new Set(prev).add(key));
+    const newHiddenState = !currentHidden;
+
+    // 1. Optimistic instant UI update
+    setProducts((prev) =>
+      prev.map((p) =>
+        String(p.id) === key || String(p._id) === key
+          ? { ...p, isHidden: newHiddenState }
+          : p
+      )
+    );
+
+    setToastMessage(
+      newHiddenState
+        ? `Part "${partNumber}" is now HIDDEN from the main website.`
+        : `Part "${partNumber}" is now PUBLISHED and visible on the main website.`
+    );
+
     try {
       await api.toggleProductVisibility(id);
-      const isNowHidden = !currentHidden;
+    } catch (err) {
+      console.error("Failed to toggle visibility:", err);
+      // Revert on error
       setProducts((prev) =>
         prev.map((p) =>
-          String(p.id) === String(id) || String(p._id) === String(id)
-            ? { ...p, isHidden: isNowHidden }
+          String(p.id) === key || String(p._id) === key
+            ? { ...p, isHidden: currentHidden }
             : p
         )
       );
-      setToastMessage(
-        isNowHidden
-          ? `Part "${partNumber}" is now HIDDEN from the main website.`
-          : `Part "${partNumber}" is now PUBLISHED and visible on the main website.`
-      );
-    } catch (err) {
-      console.error("Failed to toggle visibility:", err);
-      alert("Failed to toggle visibility: " + err.message);
+      setToastMessage(`Error: Could not toggle visibility for "${partNumber}".`);
+    } finally {
+      setTogglingProductIds((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
     }
   };
 
   const handleToggleCategoryVisibility = async (catId, catName, currentHidden) => {
     if (!catId || catId === "undefined" || catId === "null") {
-      alert("Invalid category identifier.");
+      setToastMessage("Invalid category identifier.");
       return;
     }
+
+    const key = String(catId);
+    if (togglingCategoryIds.has(key)) return; // Prevent double-click spam
+
+    setTogglingCategoryIds((prev) => new Set(prev).add(key));
+    const newHiddenState = !currentHidden;
+
+    // 1. Optimistic instant UI update (0ms latency, zero flicker)
+    setCategories((prev) =>
+      prev.map((c) =>
+        String(c.id || c._id) === key ? { ...c, isHidden: newHiddenState } : c
+      )
+    );
+
+    setToastMessage(
+      newHiddenState
+        ? `Category "${catName}" is now HIDDEN from the main website.`
+        : `Category "${catName}" is now PUBLISHED and visible on the main website.`
+    );
+
     try {
       const updated = await api.toggleCategoryVisibility(catId);
-      const isNowHidden = updated ? Boolean(updated.isHidden) : !currentHidden;
-      setCategories((prev) =>
-        prev.map((c) =>
-          String(c.id || c._id) === String(catId) ? { ...c, isHidden: isNowHidden } : c
-        )
-      );
-      setToastMessage(
-        isNowHidden
-          ? `Category "${catName}" & its products are now HIDDEN from the main website.`
-          : `Category "${catName}" is now PUBLISHED and visible on the main website.`
-      );
+      if (updated && updated.isHidden !== undefined) {
+        setCategories((prev) =>
+          prev.map((c) =>
+            String(c.id || c._id) === key
+              ? { ...c, isHidden: Boolean(updated.isHidden) }
+              : c
+          )
+        );
+      }
     } catch (err) {
       console.error("Failed to toggle category visibility:", err);
-      alert("Failed to toggle category visibility: " + (err.message || "Network error"));
+      // Revert optimistic update on error
+      setCategories((prev) =>
+        prev.map((c) =>
+          String(c.id || c._id) === key ? { ...c, isHidden: currentHidden } : c
+        )
+      );
+      setToastMessage(`Error: Could not toggle visibility for "${catName}".`);
+    } finally {
+      setTogglingCategoryIds((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
     }
   };
 
@@ -324,26 +380,30 @@ export default function App() {
             {categories.map((cat) => {
               const catIdentifier = cat.id || cat._id;
               const isHidden = Boolean(cat.isHidden);
+              const isToggling = togglingCategoryIds.has(String(catIdentifier));
               const productCount = products.filter((p) => matchCategory(p, catIdentifier)).length;
               return (
                 <div
                   key={catIdentifier}
-                  onClick={() => handleOpenEditCategory(cat)}
-                  className={`group p-2.5 rounded-[3px] border transition-all flex items-center justify-between gap-2 cursor-pointer shadow-2xs hover:shadow-md ${isHidden
+                  onClick={(e) => {
+                    if (e.target.closest("button")) return;
+                    handleOpenEditCategory(cat);
+                  }}
+                  className={`group p-2.5 rounded-[3px] border transition-all duration-200 ease-in-out flex items-center justify-between gap-2 cursor-pointer shadow-2xs hover:shadow-md select-none ${isHidden
                     ? "bg-amber-50/70 border-amber-300 hover:border-amber-400"
                     : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A] hover:bg-white"
                     }`}
                   title="Click to edit category details or delete"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative group-hover:scale-105 transition-transform">
+                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative group-hover:scale-105 transition-transform duration-200">
                       <img
                         src={cat.image || "/assets/products/transformers_chokes.jpg"}
                         alt={cat.name}
                         className="w-full h-full object-cover"
                       />
                       {isHidden && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200">
                           <TechnicalIcon name="eye-off" className="w-3 h-3 text-amber-300" />
                         </div>
                       )}
@@ -360,15 +420,15 @@ export default function App() {
                           {productCount} items
                         </span>
                         <span>&bull;</span>
-                        {isHidden ? (
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1 py-0.2 rounded border border-amber-200">
-                            HIDDEN
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-1 py-0.2 rounded border border-emerald-200">
-                            LIVE
-                          </span>
-                        )}
+                        <span
+                          className={`text-[9px] font-mono font-bold px-1 py-0.2 rounded border transition-colors duration-200 ${
+                            isHidden
+                              ? "text-amber-800 bg-amber-100/70 border-amber-200"
+                              : "text-emerald-800 bg-emerald-100/70 border-emerald-200"
+                          }`}
+                        >
+                          {isHidden ? "HIDDEN" : "LIVE"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -379,10 +439,11 @@ export default function App() {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         handleOpenEditCategory(cat);
                       }}
                       title="Edit Category Details & Banner"
-                      className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] bg-white hover:bg-[#A77C3A] hover:text-white text-[#071522] border border-[#132333]/15 transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                      className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] bg-white hover:bg-[#A77C3A] hover:text-white text-[#071522] border border-[#132333]/15 transition-all duration-150 active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
                     >
                       <TechnicalIcon name="edit" className="w-2.5 h-2.5" />
                       <span>Edit</span>
@@ -390,17 +451,25 @@ export default function App() {
 
                     <button
                       type="button"
+                      disabled={isToggling}
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         handleToggleCategoryVisibility(catIdentifier, cat.name, isHidden);
                       }}
                       title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
-                      className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] transition-colors flex items-center gap-1 cursor-pointer ${isHidden
-                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                        : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
-                        }`}
+                      className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] transition-all duration-150 ease-out active:scale-95 flex items-center gap-1 cursor-pointer select-none ${
+                        isToggling ? "opacity-60 cursor-wait pointer-events-none" : ""
+                      } ${
+                        isHidden
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                          : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
+                      }`}
                     >
-                      <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-2.5 h-2.5" />
+                      <TechnicalIcon
+                        name={isHidden ? "eye" : "eye-off"}
+                        className={`w-2.5 h-2.5 transition-transform duration-200 ${isToggling ? "animate-pulse" : ""}`}
+                      />
                       <span>{isHidden ? "Unhide" : "Hide"}</span>
                     </button>
                   </div>

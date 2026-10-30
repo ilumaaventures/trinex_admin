@@ -250,7 +250,7 @@ export function CategoryModal({
                 <button
                   type="button"
                   onClick={() => setIsHidden(false)}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all duration-150 active:scale-95 select-none flex items-center gap-1.5 cursor-pointer ${
                     !isHidden
                       ? "bg-emerald-600 border-emerald-700 text-white shadow-xs"
                       : "bg-white border-[#132333]/20 text-[#132333]/70 hover:bg-emerald-50 hover:text-emerald-800"
@@ -262,7 +262,7 @@ export function CategoryModal({
                 <button
                   type="button"
                   onClick={() => setIsHidden(true)}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all duration-150 active:scale-95 select-none flex items-center gap-1.5 cursor-pointer ${
                     isHidden
                       ? "bg-amber-600 border-amber-700 text-white shadow-xs"
                       : "bg-white border-[#132333]/20 text-[#132333]/70 hover:bg-amber-50 hover:text-amber-800"
