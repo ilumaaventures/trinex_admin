@@ -7,6 +7,69 @@ export const API_BASE = rawApiUrl
     : `${rawApiUrl}/api`
   : (import.meta.env?.DEV ? "/api" : "https://trinex-be.onrender.com/api");
 const LOCAL_STORAGE_KEY = "trinex_inventory_products_v1";
+const AUTH_TOKEN_KEY = "trinex_admin_token";
+const AUTH_USER_KEY = "trinex_admin_user";
+
+export function getAuthToken() {
+  try {
+    return (
+      localStorage.getItem(AUTH_TOKEN_KEY) ||
+      sessionStorage.getItem(AUTH_TOKEN_KEY) ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+}
+
+export function getCurrentUser() {
+  try {
+    const raw =
+      localStorage.getItem(AUTH_USER_KEY) ||
+      sessionStorage.getItem(AUTH_USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthSession(token, user, rememberMe = true) {
+  try {
+    if (rememberMe) {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      sessionStorage.removeItem(AUTH_TOKEN_KEY);
+      sessionStorage.removeItem(AUTH_USER_KEY);
+    } else {
+      sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+      sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_USER_KEY);
+    }
+  } catch (err) {
+    console.warn("Storage write failed for auth session:", err);
+  }
+}
+
+export function clearAuthSession() {
+  try {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+    sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    sessionStorage.removeItem(AUTH_USER_KEY);
+  } catch (err) {
+    console.warn("Storage clear failed for auth session:", err);
+  }
+}
+
+function getAuthHeaders(extra = {}) {
+  const token = getAuthToken();
+  const headers = { ...extra };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 const INITIAL_SEED_PRODUCTS = [
   {
@@ -566,5 +629,76 @@ export const api = {
     }));
     setLocalProducts(seeded);
     return seeded;
+  },
+
+  // 7. Authentication Suite
+  getAuthToken,
+  getCurrentUser,
+  isAuthenticated() {
+    return Boolean(getAuthToken());
+  },
+
+  async login({ emailOrUsername, password, rememberMe = true }) {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ emailOrUsername, password, rememberMe }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Invalid credentials. Access denied.");
+    }
+    setAuthSession(json.token, json.user, rememberMe);
+    window.dispatchEvent(new Event("auth-changed"));
+    return json;
+  },
+
+  async verifyAuth() {
+    const token = getAuthToken();
+    if (!token) {
+      return { authenticated: false, user: null };
+    }
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.success) {
+        if (json.user) {
+          const isRemembered = Boolean(localStorage.getItem(AUTH_TOKEN_KEY));
+          setAuthSession(token, json.user, isRemembered);
+        }
+        return { authenticated: true, user: json.user || getCurrentUser() };
+      } else {
+        clearAuthSession();
+        window.dispatchEvent(new Event("auth-changed"));
+        return { authenticated: false, user: null };
+      }
+    } catch (err) {
+      console.warn("Auth verify network check failed:", err);
+      // In offline / network glitch fallback, keep existing session if cached user exists
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        return { authenticated: true, user: currentUser };
+      }
+      return { authenticated: false, user: null };
+    }
+  },
+
+  async logout() {
+    const token = getAuthToken();
+    try {
+      if (token) {
+        await fetch(`${API_BASE}/auth/logout`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+        }).catch(() => {});
+      }
+    } finally {
+      clearAuthSession();
+      window.dispatchEvent(new Event("auth-changed"));
+    }
+    return true;
   },
 };

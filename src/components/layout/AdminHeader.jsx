@@ -14,6 +14,8 @@ export function AdminHeader({
   onExportJson,
   onOpenCreateCategory,
   clientUrl = defaultClientUrl,
+  currentUser,
+  onLogout,
 }) {
   const sitemapUrl = `${defaultBackendUrl}/sitemap.xml`;
   return (
@@ -39,6 +41,18 @@ export function AdminHeader({
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {currentUser && (
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-white/5 border border-white/10 rounded-[2px] text-xs font-mono">
+              <TechnicalIcon name="user" className="w-3.5 h-3.5 text-[#C29A58]" />
+              <span className="text-white/80 text-[11px] max-w-[140px] truncate" title={currentUser.email || currentUser.username}>
+                {currentUser.email || currentUser.username || "ADMIN"}
+              </span>
+              <span className="text-[9px] px-1 py-0.5 bg-[#A77C3A]/30 text-[#E5C388] font-bold rounded-[2px] uppercase">
+                {currentUser.role || "ADMIN"}
+              </span>
+            </div>
+          )}
+
           {onOpenCreateCategory && (
             <button
               type="button"
@@ -80,6 +94,18 @@ export function AdminHeader({
             <TechnicalIcon name="download" className="w-3.5 h-3.5 mr-1.5 text-[#A77C3A]" />
             EXPORT JSON
           </Button>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-red-950/40 hover:bg-red-900/70 border border-red-500/40 hover:border-red-400 text-red-200 hover:text-white text-[11px] font-mono font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer shadow-xs"
+              title="Terminate session and log out"
+            >
+              <TechnicalIcon name="log-out" className="w-3.5 h-3.5 text-red-400" />
+              <span>LOGOUT</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

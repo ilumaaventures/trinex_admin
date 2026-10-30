@@ -6,6 +6,7 @@ import { ProductCardGrid } from "./components/products/ProductCardGrid";
 import { ProductEditorModal } from "./components/products/ProductEditorModal";
 import { CategoryModal } from "./components/categories/CategoryModal";
 import { DeleteConfirmModal } from "./components/products/DeleteConfirmModal";
+import { LoginPage } from "./components/auth/LoginPage";
 import { TechnicalIcon } from "./components/ui/TechnicalIcon";
 import { Toast } from "./components/ui/Toast";
 
@@ -28,6 +29,10 @@ export function matchCategory(product, catId) {
 }
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => api.isAuthenticated());
+  const [currentUser, setCurrentUser] = useState(() => api.getCurrentUser());
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +40,6 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
   const [viewMode, setViewMode] = useState("table");
-
 
   // Modals state
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -52,8 +56,43 @@ export default function App() {
   // Toast state
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Load products and categories on mount & keep in sync
+  // 1. Session verification on mount
   useEffect(() => {
+    let isMounted = true;
+
+    async function checkAuthSession() {
+      try {
+        const { authenticated, user } = await api.verifyAuth();
+        if (isMounted) {
+          setIsAuthenticated(authenticated);
+          setCurrentUser(user);
+        }
+      } catch (err) {
+        console.warn("Auth session verification error:", err);
+      } finally {
+        if (isMounted) {
+          setIsAuthChecking(false);
+        }
+      }
+    }
+
+    checkAuthSession();
+
+    const handleAuthChanged = () => {
+      setIsAuthenticated(api.isAuthenticated());
+      setCurrentUser(api.getCurrentUser());
+    };
+    window.addEventListener("auth-changed", handleAuthChanged);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("auth-changed", handleAuthChanged);
+    };
+  }, []);
+
+  // 2. Load products and categories once authenticated & keep in sync
+  useEffect(() => {
+    if (!isAuthenticated) return;
     let isMounted = true;
 
     async function load(showLoading = false) {
@@ -91,7 +130,7 @@ export default function App() {
       window.removeEventListener("categories-updated", handleFocusOrUpdate);
       window.removeEventListener("inventory-updated", handleFocusOrUpdate);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
@@ -339,12 +378,58 @@ export default function App() {
     setToastMessage("Exported inventory JSON catalog.");
   };
 
+  const handleLoginSuccess = (user) => {
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+    setToastMessage(`Welcome back, ${user?.name || user?.email || "Administrator"}! Access granted.`);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch (err) {
+      console.warn("Logout error:", err);
+    }
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setToastMessage("You have been logged out securely.");
+  };
+
+  // Auth Checking Loading Screen
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-[#071522] text-[#FAF9F6] flex flex-col justify-center items-center font-mono select-none">
+        <div className="w-9 h-9 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin mb-4" />
+        <span className="text-xs tracking-widest text-[#C29A58] uppercase font-bold">
+          Verifying Security Credentials...
+        </span>
+        <span className="text-[10px] text-white/40 mt-1 uppercase tracking-wider">
+          Trinex Systems Defence Portal
+        </span>
+      </div>
+    );
+  }
+
+  // Unauthenticated: Present High-Security Defense Login Gate
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+        {toastMessage && (
+          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#132333] flex flex-col antialiased">
       {/* 1. Subdomain Header */}
       <AdminHeader
         onExportJson={handleExportJson}
         onOpenCreateCategory={handleOpenCreateCategory}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* 2. Main Dashboard Area */}

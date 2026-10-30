@@ -136,6 +136,25 @@ export function TechnicalIcon({ name, className = "w-5 h-5", strokeWidth = 1.75 
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
+    lock: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    user: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="12" cy="7" r="4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    "log-out": (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points="16 17 21 12 16 7" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="21" y1="12" x2="9" y2="12" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
   };
 
   return icons[name] || icons["box"];
