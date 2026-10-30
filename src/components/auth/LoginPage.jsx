@@ -95,7 +95,7 @@ export function LoginPage({ onLoginSuccess }) {
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="admin@trinexsystems.com or admin"
+                  placeholder="admin@trinexsystems.in or admin"
                   disabled={isLoading}
                   className="w-full pl-9 pr-3 py-2.5 bg-[#050E17]/90 border border-white/15 text-xs font-mono rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#A77C3A] focus:ring-1 focus:ring-[#A77C3A] transition-colors"
                 />
