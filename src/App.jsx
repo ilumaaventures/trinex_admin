@@ -366,16 +366,66 @@ export default function App() {
     }
   };
 
-  const handleExportJson = () => {
-    const jsonStr = JSON.stringify(products, null, 2);
-    const blob = new Blob([jsonStr], { type: "application/json" });
+  const handleExportExcel = () => {
+    if (!products || products.length === 0) {
+      setToastMessage("No inventory items found to export.");
+      return;
+    }
+
+    // Generate Excel-compatible CSV with UTF-8 BOM so MS Excel renders all characters cleanly
+    const BOM = "\uFEFF";
+    const headers = [
+      "Category",
+      "Product Name",
+      "Quantity",
+      "Stock Place",
+      "Technical Details",
+      "Delivery Timeline",
+      "Compliance Standard",
+      "Website Visibility",
+    ];
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const clean = String(val).replace(/"/g, '""').replace(/[\r\n]+/g, " ");
+      return `"${clean}"`;
+    };
+
+    const rows = products.map((item) => {
+      const categoryName = item.category || item.categoryKey || "UNSPECIFIED";
+      const productName = item.partNumber || item.name || item.title || "";
+      const quantity = item.stock ?? 0;
+      const stockPlace = item.location || "Ready Stock (Delhi)";
+      const description = item.description || "";
+      const delivery = item.delivery || "Immediate Dispatch";
+      const compliance = item.compliance || "MIL-STD-883 / ISO 9001";
+      const visibility = item.isHidden ? "Hidden from Website" : "Live on Website";
+
+      return [
+        escapeCsv(categoryName),
+        escapeCsv(productName),
+        escapeCsv(quantity),
+        escapeCsv(stockPlace),
+        escapeCsv(description),
+        escapeCsv(delivery),
+        escapeCsv(compliance),
+        escapeCsv(visibility),
+      ].join(",");
+    });
+
+    const csvContent = BOM + [headers.map(escapeCsv).join(","), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+    const dateStr = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = `trinex-products-inventory-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `trinex-inventory-${dateStr}.csv`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    setToastMessage("Exported inventory JSON catalog.");
+
+    setToastMessage(`Exported ${products.length} products to Excel spreadsheet.`);
   };
 
   const handleLoginSuccess = (user) => {
@@ -426,8 +476,7 @@ export default function App() {
     <div className="min-h-screen bg-[#FAF9F6] text-[#132333] flex flex-col antialiased">
       {/* 1. Subdomain Header */}
       <AdminHeader
-        onExportJson={handleExportJson}
-        onOpenCreateCategory={handleOpenCreateCategory}
+        onExportExcel={handleExportExcel}
         currentUser={currentUser}
         onLogout={handleLogout}
       />
