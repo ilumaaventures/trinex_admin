@@ -18,6 +18,7 @@ export default function App() {
   const [stockFilter, setStockFilter] = useState("all");
   const [viewMode, setViewMode] = useState("table");
 
+
   // Modals state
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -255,11 +256,10 @@ export default function App() {
               return (
                 <div
                   key={cat.id}
-                  className={`p-2.5 rounded-[3px] border transition-all flex items-center justify-between gap-2 ${
-                    isHidden
-                      ? "bg-amber-50/70 border-amber-300"
-                      : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A]/50"
-                  }`}
+                  className={`p-2.5 rounded-[3px] border transition-all flex items-center justify-between gap-2 ${isHidden
+                    ? "bg-amber-50/70 border-amber-300"
+                    : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A]/50"
+                    }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative">
@@ -278,9 +278,8 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setSelectedCategory(isSelected ? "all" : cat.id)}
-                        className={`font-bold text-xs uppercase truncate block text-left hover:text-[#A77C3A] transition-colors cursor-pointer ${
-                          isSelected ? "text-[#A77C3A] underline" : "text-[#071522]"
-                        }`}
+                        className={`font-bold text-xs uppercase truncate block text-left hover:text-[#A77C3A] transition-colors cursor-pointer ${isSelected ? "text-[#A77C3A] underline" : "text-[#071522]"
+                          }`}
                         title={`Filter by ${cat.name}`}
                       >
                         {cat.name}
@@ -308,11 +307,10 @@ export default function App() {
                     type="button"
                     onClick={() => handleToggleCategoryVisibility(cat.id, cat.name, isHidden)}
                     title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
-                    className={`px-2 py-1 text-[10px] font-mono font-bold uppercase rounded-[2px] transition-colors flex items-center gap-1 cursor-pointer flex-shrink-0 ${
-                      isHidden
-                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                        : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
-                    }`}
+                    className={`px-2 py-1 text-[10px] font-mono font-bold uppercase rounded-[2px] transition-colors flex items-center gap-1 cursor-pointer flex-shrink-0 ${isHidden
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                      : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
+                      }`}
                   >
                     <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-3 h-3" />
                     <span>{isHidden ? "Unhide" : "Hide"}</span>
@@ -387,11 +385,10 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSelectedCategory("all")}
-                className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${
-                  selectedCategory === "all"
-                    ? "bg-[#071522] text-[#A77C3A] font-bold"
-                    : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
-                }`}
+                className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${selectedCategory === "all"
+                  ? "bg-[#071522] text-[#A77C3A] font-bold"
+                  : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
+                  }`}
               >
                 All ({products.length})
               </button>
@@ -403,11 +400,10 @@ export default function App() {
                     key={cat.id}
                     type="button"
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${
-                      selectedCategory === cat.id
-                        ? "bg-[#071522] text-[#A77C3A] font-bold"
-                        : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
-                    }`}
+                    className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${selectedCategory === cat.id
+                      ? "bg-[#071522] text-[#A77C3A] font-bold"
+                      : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
+                      }`}
                   >
                     {cat.name} ({count})
                   </button>
@@ -431,11 +427,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 cursor-pointer ${
-                    viewMode === "table"
-                      ? "bg-[#071522] text-[#A77C3A]"
-                      : "bg-white text-[#68717A]"
-                  }`}
+                  className={`p-1.5 cursor-pointer ${viewMode === "table"
+                    ? "bg-[#071522] text-[#A77C3A]"
+                    : "bg-white text-[#68717A]"
+                    }`}
                   title="Table view"
                 >
                   <TechnicalIcon name="layers" className="w-3.5 h-3.5" />
@@ -443,11 +438,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setViewMode("cards")}
-                  className={`p-1.5 cursor-pointer ${
-                    viewMode === "cards"
-                      ? "bg-[#071522] text-[#A77C3A]"
-                      : "bg-white text-[#68717A]"
-                  }`}
+                  className={`p-1.5 cursor-pointer ${viewMode === "cards"
+                    ? "bg-[#071522] text-[#A77C3A]"
+                    : "bg-white text-[#68717A]"
+                    }`}
                   title="Card grid view"
                 >
                   <TechnicalIcon name="grid" className="w-3.5 h-3.5" />
