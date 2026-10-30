@@ -164,13 +164,6 @@ export function LoginPage({ onLoginSuccess }) {
             </div>
           </form>
         </div>
-
-        {/* Footer Security Badge */}
-        <div className="bg-[#050E17]/80 px-6 py-3 border-t border-white/10 text-center">
-          <p className="text-[10px] font-mono text-white/40 tracking-wider">
-            &bull; 256-BIT ENCRYPTED SESSION &bull; TRINEX SYSTEMS LLP &bull;
-          </p>
-        </div>
       </div>
     </div>
   );
