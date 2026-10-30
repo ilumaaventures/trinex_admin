@@ -106,11 +106,12 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
               <button
                 type="button"
                 onClick={() => onToggleVisibility?.(productId, product.partNumber, isSelfHidden)}
-                className={`text-[11px] font-bold uppercase inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                className={`text-[11px] font-bold uppercase inline-flex items-center gap-1 transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none ${
                   isSelfHidden ? "text-emerald-700 hover:text-emerald-900" : "text-amber-700 hover:text-amber-900"
                 }`}
+                title={isSelfHidden ? "Unhide on main website" : "Hide from main website"}
               >
-                <TechnicalIcon name={isSelfHidden ? "eye" : "eye-off"} className="w-3.5 h-3.5" />
+                <TechnicalIcon name={isSelfHidden ? "eye" : "eye-off"} className="w-3.5 h-3.5 transition-transform duration-150" />
                 <span>{isSelfHidden ? "Unhide" : "Hide"}</span>
               </button>
 

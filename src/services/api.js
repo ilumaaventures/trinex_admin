@@ -446,7 +446,18 @@ export const api = {
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.success) return json.data;
+        if (json.success && json.data) {
+          try {
+            const current = getLocalProducts();
+            const updated = current.map((p) =>
+              String(p.id) === String(id) || String(p._id) === String(id)
+                ? { ...p, isHidden: json.data.isHidden }
+                : p
+            );
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+          } catch {}
+          return json.data;
+        }
       }
     } catch {
       // Fallback
@@ -461,7 +472,9 @@ export const api = {
       }
       return p;
     });
-    setLocalProducts(updated);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+    } catch {}
     return updatedProduct;
   },
 
@@ -501,11 +514,13 @@ export const api = {
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          const current = getLocalCategories();
-          const updated = current.map((c) =>
-            String(c.id || c._id) === String(id) ? { ...c, isHidden: json.data.isHidden } : c
-          );
-          setLocalCategories(updated);
+          try {
+            const current = getLocalCategories();
+            const updated = current.map((c) =>
+              String(c.id || c._id) === String(id) ? { ...c, isHidden: json.data.isHidden } : c
+            );
+            localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(updated));
+          } catch {}
           return json.data;
         }
       }

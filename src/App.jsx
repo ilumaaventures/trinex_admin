@@ -49,10 +49,6 @@ export default function App() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState(null);
 
-  // In-flight visibility toggle tracking (prevents rapid double-click race conditions)
-  const [togglingCategoryIds, setTogglingCategoryIds] = useState(() => new Set());
-  const [togglingProductIds, setTogglingProductIds] = useState(() => new Set());
-
   // Toast state
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -117,18 +113,12 @@ export default function App() {
 
     load(true);
 
-    const handleFocusOrUpdate = () => load(false);
-    window.addEventListener("focus", handleFocusOrUpdate);
-    window.addEventListener("storage", handleFocusOrUpdate);
-    window.addEventListener("categories-updated", handleFocusOrUpdate);
-    window.addEventListener("inventory-updated", handleFocusOrUpdate);
+    const handleFocus = () => load(false);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       isMounted = false;
-      window.removeEventListener("focus", handleFocusOrUpdate);
-      window.removeEventListener("storage", handleFocusOrUpdate);
-      window.removeEventListener("categories-updated", handleFocusOrUpdate);
-      window.removeEventListener("inventory-updated", handleFocusOrUpdate);
+      window.removeEventListener("focus", handleFocus);
     };
   }, [isAuthenticated]);
 
@@ -211,14 +201,11 @@ export default function App() {
     }
   };
 
-  const handleToggleProductVisibility = async (id, partNumber, currentHidden) => {
+  const handleToggleProductVisibility = (id, partNumber, currentHidden) => {
     const key = String(id);
-    if (togglingProductIds.has(key)) return;
-
-    setTogglingProductIds((prev) => new Set(prev).add(key));
     const newHiddenState = !currentHidden;
 
-    // 1. Optimistic instant UI update
+    // 1. Instant optimistic UI update (0ms latency, butter-smooth)
     setProducts((prev) =>
       prev.map((p) =>
         String(p.id) === key || String(p._id) === key
@@ -233,11 +220,9 @@ export default function App() {
         : `Part "${partNumber}" is now PUBLISHED and visible on the main website.`
     );
 
-    try {
-      await api.toggleProductVisibility(id);
-    } catch (err) {
+    // 2. Background sync with automatic rollback on network failure
+    api.toggleProductVisibility(id).catch((err) => {
       console.error("Failed to toggle visibility:", err);
-      // Revert on error
       setProducts((prev) =>
         prev.map((p) =>
           String(p.id) === key || String(p._id) === key
@@ -246,28 +231,19 @@ export default function App() {
         )
       );
       setToastMessage(`Error: Could not toggle visibility for "${partNumber}".`);
-    } finally {
-      setTogglingProductIds((prev) => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-    }
+    });
   };
 
-  const handleToggleCategoryVisibility = async (catId, catName, currentHidden) => {
+  const handleToggleCategoryVisibility = (catId, catName, currentHidden) => {
     if (!catId || catId === "undefined" || catId === "null") {
       setToastMessage("Invalid category identifier.");
       return;
     }
 
     const key = String(catId);
-    if (togglingCategoryIds.has(key)) return; // Prevent double-click spam
-
-    setTogglingCategoryIds((prev) => new Set(prev).add(key));
     const newHiddenState = !currentHidden;
 
-    // 1. Optimistic instant UI update (0ms latency, zero flicker)
+    // 1. Instant optimistic UI update (0ms latency, butter-smooth)
     setCategories((prev) =>
       prev.map((c) =>
         String(c.id || c._id) === key ? { ...c, isHidden: newHiddenState } : c
@@ -280,33 +256,16 @@ export default function App() {
         : `Category "${catName}" is now PUBLISHED and visible on the main website.`
     );
 
-    try {
-      const updated = await api.toggleCategoryVisibility(catId);
-      if (updated && updated.isHidden !== undefined) {
-        setCategories((prev) =>
-          prev.map((c) =>
-            String(c.id || c._id) === key
-              ? { ...c, isHidden: Boolean(updated.isHidden) }
-              : c
-          )
-        );
-      }
-    } catch (err) {
+    // 2. Background sync with automatic rollback on network failure
+    api.toggleCategoryVisibility(catId).catch((err) => {
       console.error("Failed to toggle category visibility:", err);
-      // Revert optimistic update on error
       setCategories((prev) =>
         prev.map((c) =>
           String(c.id || c._id) === key ? { ...c, isHidden: currentHidden } : c
         )
       );
       setToastMessage(`Error: Could not toggle visibility for "${catName}".`);
-    } finally {
-      setTogglingCategoryIds((prev) => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-    }
+    });
   };
 
   const handleOpenCreateCategory = () => {
@@ -514,7 +473,6 @@ export default function App() {
             {categories.map((cat) => {
               const catIdentifier = cat.id || cat._id;
               const isHidden = Boolean(cat.isHidden);
-              const isToggling = togglingCategoryIds.has(String(catIdentifier));
               const productCount = products.filter((p) => matchCategory(p, catIdentifier)).length;
               return (
                 <div
@@ -585,7 +543,6 @@ export default function App() {
 
                     <button
                       type="button"
-                      disabled={isToggling}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -593,8 +550,6 @@ export default function App() {
                       }}
                       title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
                       className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] transition-all duration-150 ease-out active:scale-95 flex items-center gap-1 cursor-pointer select-none ${
-                        isToggling ? "opacity-60 cursor-wait pointer-events-none" : ""
-                      } ${
                         isHidden
                           ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                           : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
@@ -602,7 +557,7 @@ export default function App() {
                     >
                       <TechnicalIcon
                         name={isHidden ? "eye" : "eye-off"}
-                        className={`w-2.5 h-2.5 transition-transform duration-200 ${isToggling ? "animate-pulse" : ""}`}
+                        className="w-2.5 h-2.5 transition-transform duration-150"
                       />
                       <span>{isHidden ? "Unhide" : "Hide"}</span>
                     </button>
