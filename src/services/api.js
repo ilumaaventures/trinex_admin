@@ -1,6 +1,11 @@
 import { buildDefaultSeo } from "./seoService";
 
-const API_BASE = (import.meta.env?.VITE_API_URL || "/api").replace(/\/+$/, "");
+const rawApiUrl = (import.meta.env?.VITE_API_URL || "").trim().replace(/\/+$/, "");
+export const API_BASE = rawApiUrl
+  ? rawApiUrl.endsWith("/api")
+    ? rawApiUrl
+    : `${rawApiUrl}/api`
+  : (import.meta.env?.DEV ? "/api" : "https://trinex-be.onrender.com/api");
 const LOCAL_STORAGE_KEY = "trinex_inventory_products_v1";
 
 const INITIAL_SEED_PRODUCTS = [

@@ -1,7 +1,21 @@
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 import { Button } from "../ui/Button";
 
-export function AdminHeader({ onExportJson, onOpenCreateCategory, clientUrl = "http://localhost:5173" }) {
+const defaultClientUrl =
+  import.meta.env.VITE_CLIENT_URL ||
+  (import.meta.env.DEV ? "http://localhost:5173" : "https://trinex-fe.vercel.app");
+
+const defaultBackendUrl = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:5000" : "https://trinex-be.onrender.com")
+).replace(/\/api\/?$/, "");
+
+export function AdminHeader({
+  onExportJson,
+  onOpenCreateCategory,
+  clientUrl = defaultClientUrl,
+}) {
+  const sitemapUrl = `${defaultBackendUrl}/sitemap.xml`;
   return (
     <header className="bg-[#071522] text-white border-b border-white/10 sticky top-0 z-40 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -37,7 +51,7 @@ export function AdminHeader({ onExportJson, onOpenCreateCategory, clientUrl = "h
           )}
 
           <a
-            href="http://localhost:5000/sitemap.xml"
+            href={sitemapUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#A77C3A]/20 hover:bg-[#A77C3A]/30 border border-[#A77C3A]/50 text-[#E5C388] hover:text-white text-[11px] font-mono uppercase tracking-wider rounded-[2px] transition-colors"
