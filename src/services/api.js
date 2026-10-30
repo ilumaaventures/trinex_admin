@@ -1,6 +1,6 @@
 import { buildDefaultSeo } from "./seoService";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = (import.meta.env?.VITE_API_URL || "/api").replace(/\/+$/, "");
 const LOCAL_STORAGE_KEY = "trinex_inventory_products_v1";
 
 const INITIAL_SEED_PRODUCTS = [
@@ -126,16 +126,105 @@ const INITIAL_SEED_PRODUCTS = [
   },
 ];
 
+const LOCAL_STORAGE_CATEGORIES_KEY = "trinex_inventory_categories_v1";
+
 export const CATEGORIES = [
-  { id: "transformers", name: "TRANSFORMER", subtitle: "Transformers, Power Units & Chokes" },
-  { id: "resistors", name: "RESISTOR", subtitle: "Precision & Power Resistors" },
-  { id: "capacitors", name: "CAPACITOR", subtitle: "Tantalum, Ceramic & Film" },
-  { id: "microcircuits", name: "MICRO CIRCUIT", subtitle: "Logic & Digital ICs" },
-  { id: "transistors-diodes", name: "DIODES & TRANSISTORS", subtitle: "Power Transistors & Zener Diodes" },
-  { id: "connectors", name: "CONNECTOR", subtitle: "Mil-Spec Multi-Pin Connectors" },
-  { id: "motors", name: "MOTORS & GENERATORS", subtitle: "Precision Servo Motors" },
-  { id: "switches-fuses", name: "SWITCHES & FUSES", subtitle: "Switches, Fuses & Indicators" },
+  {
+    id: "transformers",
+    name: "TRANSFORMER",
+    subtitle: "Transformers, Power Units & Chokes",
+    image: "/assets/products/transformers_chokes.jpg",
+  },
+  {
+    id: "resistors",
+    name: "RESISTOR",
+    subtitle: "Precision & Power Resistors",
+    image: "/assets/products/resistors.jpg",
+  },
+  {
+    id: "capacitors",
+    name: "CAPACITOR",
+    subtitle: "Tantalum, Ceramic & Film",
+    image: "/assets/products/capacitors.jpg",
+  },
+  {
+    id: "microcircuits",
+    name: "MICRO CIRCUIT",
+    subtitle: "Logic & Digital ICs",
+    image: "/assets/products/microcircuits.jpg",
+  },
+  {
+    id: "transistors-diodes",
+    name: "DIODES & TRANSISTORS",
+    subtitle: "Power Transistors & Zener Diodes",
+    image: "/assets/products/diodes_transistors.jpg",
+  },
+  {
+    id: "connectors",
+    name: "CONNECTOR",
+    subtitle: "Mil-Spec Multi-Pin Connectors",
+    image: "/assets/products/connectors.jpg",
+  },
+  {
+    id: "motors",
+    name: "MOTORS & GENERATORS",
+    subtitle: "Precision Servo Motors",
+    image: "/assets/products/motors_generators.jpg",
+  },
+  {
+    id: "switches-fuses",
+    name: "SWITCHES & FUSES",
+    subtitle: "Switches, Fuses & Indicators",
+    image: "/assets/products/switches_fuses.jpg",
+  },
+  {
+    id: "demo",
+    name: "DEMO",
+    subtitle: "Demonstration Components",
+    image: "https://res.cloudinary.com/dtzxn6wrm/image/upload/v1793192093/trinix/file_jntkgs.png",
+  },
 ];
+
+/**
+ * LocalStorage Fallback Helpers
+ */
+function getLocalCategories() {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_CATEGORIES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    console.warn("LocalStorage categories read failed:", err);
+  }
+
+  const seeded = CATEGORIES.map((c) => ({
+    id: c.id,
+    name: c.name,
+    subtitle: c.subtitle || "",
+    image: c.image || "/assets/products/transformers_chokes.jpg",
+    isHidden: false,
+  }));
+  try {
+    localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(seeded));
+  } catch {
+    // Ignore
+  }
+  return seeded;
+}
+
+function setLocalCategories(categories) {
+  try {
+    if (Array.isArray(categories) && categories.length > 0) {
+      localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(categories));
+      window.dispatchEvent(new Event("categories-updated"));
+      window.dispatchEvent(new Event("storage"));
+    }
+  } catch (err) {
+    console.warn("LocalStorage categories write failed:", err);
+  }
+}
 
 /**
  * LocalStorage Fallback Helper
@@ -185,12 +274,15 @@ export const api = {
   async getProducts() {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-      const res = await fetch(`${API_BASE}/products`, { signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${API_BASE}/products?_t=${Date.now()}`, {
+        signal: controller.signal,
+        headers: { "Cache-Control": "no-cache" },
+      });
       clearTimeout(timeoutId);
       if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.data)) {
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
           setLocalProducts(json.data);
           return json.data;
         }
@@ -308,36 +400,53 @@ export const api = {
   // 4C. Get Categories
   async getCategories() {
     try {
-      const res = await fetch(`${API_BASE}/categories`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${API_BASE}/categories?_t=${Date.now()}`, {
+        signal: controller.signal,
+        headers: { "Cache-Control": "no-cache" },
+      });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.data)) return json.data;
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setLocalCategories(json.data);
+          return json.data;
+        }
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn("Failed to fetch live categories, falling back to local cache:", err.message);
     }
-    return CATEGORIES.map((c) => ({
-      id: c.key,
-      name: c.name,
-      image: c.image,
-      isHidden: false,
-    }));
+    return getLocalCategories();
   },
 
   // 4D. Toggle Category Visibility
   async toggleCategoryVisibility(id) {
+    if (!id || id === "undefined" || id === "null") {
+      throw new Error("Invalid Category ID");
+    }
     try {
-      const res = await fetch(`${API_BASE}/categories/${id}/visibility`, {
+      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}/visibility`, {
         method: "PATCH",
+        headers: { "Content-Type": "application/json" },
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.success) return json.data;
+        if (json.success && json.data) {
+          const current = getLocalCategories();
+          const updated = current.map((c) =>
+            String(c.id || c._id) === String(id) ? { ...c, isHidden: json.data.isHidden } : c
+          );
+          setLocalCategories(updated);
+          return json.data;
+        }
       }
-    } catch {
-      // Fallback
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || `Server returned ${res.status}`);
+    } catch (err) {
+      console.error("Toggle category visibility error:", err);
+      throw err;
     }
-    return null;
   },
 
   // 4E. Create Category
@@ -352,6 +461,9 @@ export const api = {
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to create category");
       }
+      const current = getLocalCategories();
+      const updated = [...current, json.data];
+      setLocalCategories(updated);
       return json.data;
     } catch (err) {
       console.error("Create category error:", err);
@@ -362,7 +474,7 @@ export const api = {
   // 4F. Update Category
   async updateCategory(id, categoryData) {
     try {
-      const res = await fetch(`${API_BASE}/categories/${id}`, {
+      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(categoryData),
@@ -371,6 +483,11 @@ export const api = {
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to update category");
       }
+      const current = getLocalCategories();
+      const updated = current.map((c) =>
+        String(c.id || c._id) === String(id) ? { ...c, ...json.data } : c
+      );
+      setLocalCategories(updated);
       return json.data;
     } catch (err) {
       console.error("Update category error:", err);
@@ -381,13 +498,16 @@ export const api = {
   // 4G. Delete Category
   async deleteCategory(id) {
     try {
-      const res = await fetch(`${API_BASE}/categories/${id}`, {
+      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
         method: "DELETE",
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to delete category");
       }
+      const current = getLocalCategories();
+      const updated = current.filter((c) => String(c.id || c._id) !== String(id));
+      setLocalCategories(updated);
       return true;
     } catch (err) {
       console.error("Delete category error:", err);

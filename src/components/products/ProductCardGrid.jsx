@@ -1,6 +1,24 @@
+import { useMemo } from "react";
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 
-export function ProductCardGrid({ products, onEdit, onDelete, onToggleVisibility }) {
+export function ProductCardGrid({ products, categories = [], onEdit, onDelete, onToggleVisibility }) {
+  const categoryMap = useMemo(() => {
+    const map = new Map();
+    (categories || []).forEach((c) => {
+      if (c.id) {
+        const id = String(c.id).toLowerCase();
+        map.set(id, c);
+        map.set(id.replace(/s$/, ""), c);
+      }
+      if (c.name) {
+        const n = String(c.name).toLowerCase();
+        map.set(n, c);
+        map.set(n.replace(/s$/, ""), c);
+      }
+    });
+    return map;
+  }, [categories]);
+
   if (products.length === 0) {
     return (
       <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] space-y-2">
@@ -18,12 +36,19 @@ export function ProductCardGrid({ products, onEdit, onDelete, onToggleVisibility
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {products.map((product) => {
-        const isHidden = Boolean(product.isHidden);
+        const productId = product.id || product._id;
+        const pKey = String(product.categoryKey || "").toLowerCase();
+        const pCat = String(product.category || "").toLowerCase();
+        const parentCat = categoryMap.get(pKey) || categoryMap.get(pCat);
+        const isCategoryHidden = Boolean(parentCat?.isHidden);
+        const isSelfHidden = Boolean(product.isHidden);
+        const isEffectivelyHidden = isSelfHidden || isCategoryHidden;
+
         return (
           <div
-            key={product.id}
+            key={productId}
             className={`bg-white border rounded-[3px] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow group ${
-              isHidden ? "border-amber-300 bg-amber-50/20" : "border-[#132333]/15"
+              isEffectivelyHidden ? "border-amber-300 bg-amber-50/20" : "border-[#132333]/15"
             }`}
           >
             <div>
@@ -40,10 +65,15 @@ export function ProductCardGrid({ products, onEdit, onDelete, onToggleVisibility
 
                 {/* Status Badge */}
                 <div className="absolute top-2 left-2">
-                  {isHidden ? (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-amber-500 text-white rounded-[2px] shadow-xs flex items-center gap-1">
+                  {isSelfHidden ? (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-amber-500 text-white rounded-[2px] shadow-xs flex items-center gap-1" title="Individually hidden">
                       <TechnicalIcon name="eye-off" className="w-2.5 h-2.5" />
                       <span>HIDDEN</span>
+                    </span>
+                  ) : isCategoryHidden ? (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-amber-600 text-white rounded-[2px] shadow-xs flex items-center gap-1" title={`Category '${parentCat?.name}' is hidden on main website`}>
+                      <TechnicalIcon name="eye-off" className="w-2.5 h-2.5" />
+                      <span>HIDDEN (CATEGORY)</span>
                     </span>
                   ) : (
                     <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-emerald-600 text-white rounded-[2px] shadow-xs flex items-center gap-1">
@@ -75,13 +105,13 @@ export function ProductCardGrid({ products, onEdit, onDelete, onToggleVisibility
               {/* Hide / Unhide Toggle */}
               <button
                 type="button"
-                onClick={() => onToggleVisibility?.(product.id, product.partNumber, isHidden)}
+                onClick={() => onToggleVisibility?.(productId, product.partNumber, isSelfHidden)}
                 className={`text-[11px] font-bold uppercase inline-flex items-center gap-1 transition-colors cursor-pointer ${
-                  isHidden ? "text-emerald-700 hover:text-emerald-900" : "text-amber-700 hover:text-amber-900"
+                  isSelfHidden ? "text-emerald-700 hover:text-emerald-900" : "text-amber-700 hover:text-amber-900"
                 }`}
               >
-                <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-3.5 h-3.5" />
-                <span>{isHidden ? "Unhide" : "Hide"}</span>
+                <TechnicalIcon name={isSelfHidden ? "eye" : "eye-off"} className="w-3.5 h-3.5" />
+                <span>{isSelfHidden ? "Unhide" : "Hide"}</span>
               </button>
 
               <div className="flex items-center gap-1.5">

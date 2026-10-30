@@ -1,6 +1,23 @@
+import { useMemo } from "react";
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 
-export function ProductTable({ products, onEdit, onDelete, onToggleVisibility }) {
+export function ProductTable({ products, categories = [], onEdit, onDelete, onToggleVisibility }) {
+  const categoryMap = useMemo(() => {
+    const map = new Map();
+    (categories || []).forEach((c) => {
+      if (c.id) {
+        const id = String(c.id).toLowerCase();
+        map.set(id, c);
+        map.set(id.replace(/s$/, ""), c);
+      }
+      if (c.name) {
+        const n = String(c.name).toLowerCase();
+        map.set(n, c);
+        map.set(n.replace(/s$/, ""), c);
+      }
+    });
+    return map;
+  }, [categories]);
   if (products.length === 0) {
     return (
       <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] space-y-2">
@@ -33,17 +50,24 @@ export function ProductTable({ products, onEdit, onDelete, onToggleVisibility })
           </thead>
           <tbody className="divide-y divide-[#132333]/10 text-xs">
             {products.map((product) => {
+              const productId = product.id || product._id;
               const hasFullSeo =
                 Boolean(product.metaTitle) &&
                 Boolean(product.metaDescription) &&
                 Boolean(product.slug);
-              const isHidden = Boolean(product.isHidden);
+
+              const pKey = String(product.categoryKey || "").toLowerCase();
+              const pCat = String(product.category || "").toLowerCase();
+              const parentCat = categoryMap.get(pKey) || categoryMap.get(pCat);
+              const isCategoryHidden = Boolean(parentCat?.isHidden);
+              const isSelfHidden = Boolean(product.isHidden);
+              const isEffectivelyHidden = isSelfHidden || isCategoryHidden;
 
               return (
                 <tr
-                  key={product.id}
+                  key={productId}
                   className={`hover:bg-[#FAF9F6] transition-colors ${
-                    isHidden ? "bg-amber-50/40" : ""
+                    isEffectivelyHidden ? "bg-amber-50/40" : ""
                   }`}
                 >
                   {/* SKU */}
@@ -66,7 +90,7 @@ export function ProductTable({ products, onEdit, onDelete, onToggleVisibility })
                           className="w-4 h-4 text-gray-400"
                         />
                       )}
-                      {isHidden && (
+                      {isEffectivelyHidden && (
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                           <TechnicalIcon name="eye-off" className="w-3.5 h-3.5 text-amber-300" />
                         </div>
@@ -83,10 +107,15 @@ export function ProductTable({ products, onEdit, onDelete, onToggleVisibility })
 
                   {/* Website Visibility */}
                   <td className="py-3.5 px-4 whitespace-nowrap">
-                    {isHidden ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-mono font-bold rounded-[2px]">
+                    {isSelfHidden ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-mono font-bold rounded-[2px]" title="This product is individually hidden from the website">
                         <TechnicalIcon name="eye-off" className="w-2.5 h-2.5 text-amber-700" />
                         <span>HIDDEN</span>
+                      </span>
+                    ) : isCategoryHidden ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-mono font-bold rounded-[2px]" title={`Parent category '${parentCat?.name}' is hidden on main website`}>
+                        <TechnicalIcon name="eye-off" className="w-2.5 h-2.5 text-amber-700" />
+                        <span>HIDDEN (CATEGORY)</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-mono font-bold rounded-[2px]">
@@ -135,16 +164,16 @@ export function ProductTable({ products, onEdit, onDelete, onToggleVisibility })
                       {/* Hide/Unhide Toggle Button */}
                       <button
                         type="button"
-                        onClick={() => onToggleVisibility?.(product.id, product.partNumber, isHidden)}
+                        onClick={() => onToggleVisibility?.(productId, product.partNumber, isSelfHidden)}
                         className={`px-2 py-1 text-[11px] font-bold rounded-[2px] transition-colors cursor-pointer flex items-center gap-1 ${
-                          isHidden
+                          isSelfHidden
                             ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                             : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
                         }`}
-                        title={isHidden ? "Unhide on main website" : "Hide from main website"}
+                        title={isSelfHidden ? "Unhide on main website" : "Hide from main website"}
                       >
-                        <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-3 h-3" />
-                        <span>{isHidden ? "Unhide" : "Hide"}</span>
+                        <TechnicalIcon name={isSelfHidden ? "eye" : "eye-off"} className="w-3 h-3" />
+                        <span>{isSelfHidden ? "Unhide" : "Hide"}</span>
                       </button>
 
                       <button

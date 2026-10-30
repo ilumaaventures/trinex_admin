@@ -9,6 +9,24 @@ import { DeleteConfirmModal } from "./components/products/DeleteConfirmModal";
 import { TechnicalIcon } from "./components/ui/TechnicalIcon";
 import { Toast } from "./components/ui/Toast";
 
+// Helper for resilient category matching (handles singular/plural and slug differences)
+export function matchCategory(product, catId) {
+  if (!catId || catId === "all") return true;
+  if (!product) return false;
+  const cKey = String(catId).trim().toLowerCase();
+  const pKey = String(product.categoryKey || "").trim().toLowerCase();
+  if (pKey) {
+    if (pKey === cKey || pKey.replace(/s$/, "") === cKey.replace(/s$/, "")) return true;
+  }
+  const pCat = String(product.category || "").trim().toLowerCase();
+  if (pCat) {
+    if (pCat === cKey || pCat.replace(/s$/, "") === cKey.replace(/s$/, "")) return true;
+    const pSlug = (product.slug || "").toLowerCase();
+    if (pSlug.includes(cKey)) return true;
+  }
+  return false;
+}
+
 export default function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -23,36 +41,58 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState(null);
 
   // Toast state
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Load products and categories on mount
+  // Load products and categories on mount & keep in sync
   useEffect(() => {
-    async function load() {
-      setIsLoading(true);
+    let isMounted = true;
+
+    async function load(showLoading = false) {
+      if (showLoading) setIsLoading(true);
       try {
         const [productsData, categoriesData] = await Promise.all([
           api.getProducts(),
           api.getCategories(),
         ]);
-        setProducts(productsData);
-        if (Array.isArray(categoriesData)) setCategories(categoriesData);
+        if (isMounted) {
+          if (Array.isArray(productsData)) setProducts(productsData);
+          if (Array.isArray(categoriesData) && categoriesData.length > 0) {
+            setCategories(categoriesData);
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch products/categories:", err);
       } finally {
-        setIsLoading(false);
+        if (isMounted && showLoading) setIsLoading(false);
       }
     }
-    load();
+
+    load(true);
+
+    const handleFocusOrUpdate = () => load(false);
+    window.addEventListener("focus", handleFocusOrUpdate);
+    window.addEventListener("storage", handleFocusOrUpdate);
+    window.addEventListener("categories-updated", handleFocusOrUpdate);
+    window.addEventListener("inventory-updated", handleFocusOrUpdate);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("focus", handleFocusOrUpdate);
+      window.removeEventListener("storage", handleFocusOrUpdate);
+      window.removeEventListener("categories-updated", handleFocusOrUpdate);
+      window.removeEventListener("inventory-updated", handleFocusOrUpdate);
+    };
   }, []);
 
   // Filtered products list
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
-      if (selectedCategory !== "all" && item.categoryKey !== selectedCategory) {
+      if (selectedCategory !== "all" && !matchCategory(item, selectedCategory)) {
         return false;
       }
       if (
@@ -71,6 +111,7 @@ export default function App() {
       return (
         item.partNumber?.toLowerCase().includes(q) ||
         item.category?.toLowerCase().includes(q) ||
+        item.categoryKey?.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q) ||
         item.metaTitle?.toLowerCase().includes(q) ||
         item.metaKeywords?.toLowerCase().includes(q)
@@ -150,11 +191,17 @@ export default function App() {
   };
 
   const handleToggleCategoryVisibility = async (catId, catName, currentHidden) => {
+    if (!catId || catId === "undefined" || catId === "null") {
+      alert("Invalid category identifier.");
+      return;
+    }
     try {
-      await api.toggleCategoryVisibility(catId);
-      const isNowHidden = !currentHidden;
+      const updated = await api.toggleCategoryVisibility(catId);
+      const isNowHidden = updated ? Boolean(updated.isHidden) : !currentHidden;
       setCategories((prev) =>
-        prev.map((c) => (c.id === catId ? { ...c, isHidden: isNowHidden } : c))
+        prev.map((c) =>
+          String(c.id || c._id) === String(catId) ? { ...c, isHidden: isNowHidden } : c
+        )
       );
       setToastMessage(
         isNowHidden
@@ -163,8 +210,18 @@ export default function App() {
       );
     } catch (err) {
       console.error("Failed to toggle category visibility:", err);
-      alert("Failed to toggle category visibility: " + err.message);
+      alert("Failed to toggle category visibility: " + (err.message || "Network error"));
     }
+  };
+
+  const handleOpenCreateCategory = () => {
+    setEditingCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleOpenEditCategory = (cat) => {
+    setEditingCategory(cat);
+    setIsCategoryModalOpen(true);
   };
 
   const handleCategoryCreated = async (newCat) => {
@@ -177,11 +234,26 @@ export default function App() {
     }
   };
 
+  const handleCategoryUpdated = async (updatedCat) => {
+    try {
+      const refreshedCats = await api.getCategories();
+      if (Array.isArray(refreshedCats)) setCategories(refreshedCats);
+      const refreshedProds = await api.getProducts();
+      if (Array.isArray(refreshedProds)) setProducts(refreshedProds);
+      setToastMessage(`Category "${updatedCat.name || updatedCat.id}" updated successfully.`);
+    } catch (err) {
+      console.error("Error refreshing categories/products:", err);
+    }
+  };
+
   const handleCategoryDeleted = async (id, catName) => {
     try {
       const refreshedCats = await api.getCategories();
       if (Array.isArray(refreshedCats)) setCategories(refreshedCats);
-      setToastMessage(`Category "${catName}" removed.`);
+      const refreshedProds = await api.getProducts();
+      if (Array.isArray(refreshedProds)) setProducts(refreshedProds);
+      if (selectedCategory === id) setSelectedCategory("all");
+      setToastMessage(`Category "${catName}" removed successfully.`);
     } catch (err) {
       console.error("Error refreshing categories:", err);
     }
@@ -216,7 +288,7 @@ export default function App() {
       {/* 1. Subdomain Header */}
       <AdminHeader
         onExportJson={handleExportJson}
-        onOpenCreateCategory={() => setIsCategoryModalOpen(true)}
+        onOpenCreateCategory={handleOpenCreateCategory}
       />
 
       {/* 2. Main Dashboard Area */}
@@ -230,13 +302,13 @@ export default function App() {
                 Strategic Categories &amp; Website Visibility Control
               </h2>
               <span className="text-[10px] font-mono text-[#132333]/50 hidden md:inline">
-                &bull; Click Hide/Unhide to toggle entire category &amp; all its components from the main website
+                &bull; Click any category card to edit details &amp; delete, or click Hide/Unhide for 1-click toggle
               </span>
             </div>
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => setIsCategoryModalOpen(true)}
+                onClick={handleOpenCreateCategory}
                 className="px-2.5 py-1 bg-[#A77C3A]/20 hover:bg-[#A77C3A]/30 text-[#A77C3A] hover:text-[#071522] border border-[#A77C3A]/40 text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <TechnicalIcon name="folder-plus" className="w-3.5 h-3.5" />
@@ -250,19 +322,21 @@ export default function App() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
             {categories.map((cat) => {
+              const catIdentifier = cat.id || cat._id;
               const isHidden = Boolean(cat.isHidden);
-              const isSelected = selectedCategory === cat.id;
-              const productCount = products.filter((p) => p.categoryKey === cat.id).length;
+              const productCount = products.filter((p) => matchCategory(p, catIdentifier)).length;
               return (
                 <div
-                  key={cat.id}
-                  className={`p-2.5 rounded-[3px] border transition-all flex items-center justify-between gap-2 ${isHidden
-                    ? "bg-amber-50/70 border-amber-300"
-                    : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A]/50"
+                  key={catIdentifier}
+                  onClick={() => handleOpenEditCategory(cat)}
+                  className={`group p-2.5 rounded-[3px] border transition-all flex items-center justify-between gap-2 cursor-pointer shadow-2xs hover:shadow-md ${isHidden
+                    ? "bg-amber-50/70 border-amber-300 hover:border-amber-400"
+                    : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A] hover:bg-white"
                     }`}
+                  title="Click to edit category details or delete"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative">
+                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative group-hover:scale-105 transition-transform">
                       <img
                         src={cat.image || "/assets/products/transformers_chokes.jpg"}
                         alt={cat.name}
@@ -275,26 +349,23 @@ export default function App() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedCategory(isSelected ? "all" : cat.id)}
-                        className={`font-bold text-xs uppercase truncate block text-left hover:text-[#A77C3A] transition-colors cursor-pointer ${isSelected ? "text-[#A77C3A] underline" : "text-[#071522]"
-                          }`}
-                        title={`Filter by ${cat.name}`}
-                      >
-                        {cat.name}
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <span className="font-bold text-xs uppercase truncate block text-[#071522] group-hover:text-[#A77C3A] transition-colors">
+                          {cat.name}
+                        </span>
+                        <TechnicalIcon name="edit" className="w-2.5 h-2.5 text-[#A77C3A] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-[10px] font-mono text-[#132333]/60">
                           {productCount} items
                         </span>
                         <span>&bull;</span>
                         {isHidden ? (
-                          <span className="text-[9px] font-mono font-bold text-amber-800">
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-1 py-0.2 rounded border border-amber-200">
                             HIDDEN
                           </span>
                         ) : (
-                          <span className="text-[9px] font-mono font-bold text-emerald-700">
+                          <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100/70 px-1 py-0.2 rounded border border-emerald-200">
                             LIVE
                           </span>
                         )}
@@ -302,19 +373,37 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 1-Click Hide/Unhide Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleToggleCategoryVisibility(cat.id, cat.name, isHidden)}
-                    title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
-                    className={`px-2 py-1 text-[10px] font-mono font-bold uppercase rounded-[2px] transition-colors flex items-center gap-1 cursor-pointer flex-shrink-0 ${isHidden
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                      : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
-                      }`}
-                  >
-                    <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-3 h-3" />
-                    <span>{isHidden ? "Unhide" : "Hide"}</span>
-                  </button>
+                  {/* Actions Column: Edit & Hide/Unhide */}
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEditCategory(cat);
+                      }}
+                      title="Edit Category Details & Banner"
+                      className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] bg-white hover:bg-[#A77C3A] hover:text-white text-[#071522] border border-[#132333]/15 transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                    >
+                      <TechnicalIcon name="edit" className="w-2.5 h-2.5" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleCategoryVisibility(catIdentifier, cat.name, isHidden);
+                      }}
+                      title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
+                      className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] transition-colors flex items-center gap-1 cursor-pointer ${isHidden
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                        : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
+                        }`}
+                    >
+                      <TechnicalIcon name={isHidden ? "eye" : "eye-off"} className="w-2.5 h-2.5" />
+                      <span>{isHidden ? "Unhide" : "Hide"}</span>
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -394,18 +483,30 @@ export default function App() {
               </button>
 
               {(categories.length > 0 ? categories : CATEGORIES).map((cat) => {
-                const count = products.filter((p) => p.categoryKey === cat.id).length;
+                const catIdentifier = cat.id || cat._id;
+                const count = products.filter((p) => matchCategory(p, catIdentifier)).length;
+                const isSelected = selectedCategory === catIdentifier;
+                const isHidden = Boolean(cat.isHidden);
                 return (
                   <button
-                    key={cat.id}
+                    key={catIdentifier}
                     type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${selectedCategory === cat.id
-                      ? "bg-[#071522] text-[#A77C3A] font-bold"
-                      : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
-                      }`}
+                    onClick={() => setSelectedCategory(isSelected ? "all" : catIdentifier)}
+                    className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? "bg-[#071522] text-[#A77C3A] font-bold"
+                        : isHidden
+                        ? "bg-amber-50 text-amber-900 border border-amber-300 hover:border-amber-400"
+                        : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
+                    }`}
                   >
-                    {cat.name} ({count})
+                    <span>{cat.name}</span>
+                    <span className="opacity-70">({count})</span>
+                    {isHidden && (
+                      <span className="text-[9px] text-amber-700 font-bold ml-0.5">
+                        [HIDDEN]
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -459,6 +560,7 @@ export default function App() {
         ) : viewMode === "table" ? (
           <ProductTable
             products={filteredProducts}
+            categories={categories}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
             onToggleVisibility={handleToggleProductVisibility}
@@ -466,6 +568,7 @@ export default function App() {
         ) : (
           <ProductCardGrid
             products={filteredProducts}
+            categories={categories}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
             onToggleVisibility={handleToggleProductVisibility}
@@ -481,17 +584,22 @@ export default function App() {
         categories={categories}
         onSave={handleSaveProduct}
         onClose={() => setIsEditorOpen(false)}
-        onOpenCreateCategory={() => setIsCategoryModalOpen(true)}
+        onOpenCreateCategory={handleOpenCreateCategory}
       />
 
-      {/* 4B. Category Manager & Creation Modal */}
+      {/* 4B. Category Manager & Creation/Edit Modal */}
       <CategoryModal
         isOpen={isCategoryModalOpen}
+        categoryToEdit={editingCategory}
         categories={categories}
         onCategoryCreated={handleCategoryCreated}
+        onCategoryUpdated={handleCategoryUpdated}
         onCategoryDeleted={handleCategoryDeleted}
         onCategoryToggled={handleToggleCategoryVisibility}
-        onClose={() => setIsCategoryModalOpen(false)}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setEditingCategory(null);
+        }}
       />
 
       {/* 5. Delete Confirm Modal */}
