@@ -338,27 +338,41 @@ function setLocalProducts(products) {
  * API Service with dual-mode (backend API + localStorage fallback)
  */
 export const api = {
-  // 1. Fetch Products
-  async getProducts() {
+  // 1. Fetch Products (Supports query parameters including pagination, search, category, location)
+  async getProducts(queryParams = {}) {
+    const cleanParams = new URLSearchParams();
+    Object.entries(queryParams).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== "" && val !== "all") {
+        cleanParams.append(key, val);
+      }
+    });
+    cleanParams.append("_t", String(Date.now()));
+
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch(`${API_BASE}/products?_t=${Date.now()}`, {
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API_BASE}/products?${cleanParams.toString()}`, {
         signal: controller.signal,
         headers: { "Cache-Control": "no-cache" },
       });
       clearTimeout(timeoutId);
       if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          setLocalProducts(json.data);
-          return json.data;
+        if (json.success && Array.isArray(json.data)) {
+          const list = json.data;
+          list.pagination = json.pagination || null;
+          if (!queryParams.page || (Number(queryParams.page) === 1 && !queryParams.search && (!queryParams.category || queryParams.category === "all"))) {
+            setLocalProducts(list);
+          }
+          return list;
         }
       }
-    } catch {
-      // Fallback to local
+    } catch (err) {
+      console.warn("[API] getProducts error:", err.message);
     }
-    return getLocalProducts();
+    const local = getLocalProducts();
+    local.pagination = null;
+    return local;
   },
 
   // 2. Create Product

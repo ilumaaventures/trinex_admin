@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { api, CATEGORIES } from "./services/api";
 import { AdminHeader } from "./components/layout/AdminHeader";
 import { ProductTable } from "./components/products/ProductTable";
@@ -33,13 +33,25 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(() => api.getCurrentUser());
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
+  // Products and Infinite Scroll State
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Filters & Views
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
   const [viewMode, setViewMode] = useState("table");
+
+  // Sentinel ref for IntersectionObserver
+  const sentinelRef = useRef(null);
+  const loadingMoreRef = useRef(false);
 
   // Modals state
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -51,6 +63,14 @@ export default function App() {
 
   // Toast state
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Debounce search query by 250ms for smooth server-side searching
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   // 1. Session verification on mount
   useEffect(() => {
@@ -86,20 +106,53 @@ export default function App() {
     };
   }, []);
 
-  // 2. Load products and categories once authenticated & keep in sync
+  // Build query params for backend pagination and filtering
+  const buildQueryParams = useCallback(
+    (targetPage) => {
+      const params = {
+        page: targetPage,
+        limit: 25,
+      };
+      if (selectedCategory && selectedCategory !== "all") {
+        params.category = selectedCategory;
+      }
+      if (stockFilter === "delhi") {
+        params.location = "delhi";
+      } else if (stockFilter === "low") {
+        params.maxStock = 5;
+      }
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+      return params;
+    },
+    [selectedCategory, stockFilter, debouncedSearch]
+  );
+
+  // 2. Load page 1 of products and categories whenever filters change or authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
     let isMounted = true;
 
-    async function load(showLoading = false) {
-      if (showLoading) setIsLoading(true);
+    async function loadFirstPage() {
+      setIsLoading(true);
       try {
         const [productsData, categoriesData] = await Promise.all([
-          api.getProducts(),
+          api.getProducts(buildQueryParams(1)),
           api.getCategories(),
         ]);
         if (isMounted) {
-          if (Array.isArray(productsData)) setProducts(productsData);
+          if (Array.isArray(productsData)) {
+            setProducts(productsData);
+            setPage(1);
+            if (productsData.pagination) {
+              setHasMore(Boolean(productsData.pagination.hasNextPage));
+              setTotalCount(productsData.pagination.totalItems);
+            } else {
+              setHasMore(false);
+              setTotalCount(productsData.length);
+            }
+          }
           if (Array.isArray(categoriesData) && categoriesData.length > 0) {
             setCategories(categoriesData);
           }
@@ -107,50 +160,71 @@ export default function App() {
       } catch (err) {
         console.error("Failed to fetch products/categories:", err);
       } finally {
-        if (isMounted && showLoading) setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     }
 
-    load(true);
-
-    const handleFocus = () => load(false);
-    window.addEventListener("focus", handleFocus);
+    loadFirstPage();
 
     return () => {
       isMounted = false;
-      window.removeEventListener("focus", handleFocus);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, buildQueryParams]);
 
-  // Filtered products list
-  const filteredProducts = useMemo(() => {
-    return products.filter((item) => {
-      if (selectedCategory !== "all" && !matchCategory(item, selectedCategory)) {
-        return false;
-      }
-      if (
-        stockFilter === "delhi" &&
-        !item.location?.toLowerCase().includes("delhi")
-      ) {
-        return false;
-      }
-      if (stockFilter === "low" && item.stock > 5) {
-        return false;
-      }
+  // 3. Load next page for on-scroll infinite pagination
+  const loadNextPage = useCallback(async () => {
+    if (loadingMoreRef.current || !hasMore || isLoading || isLoadingMore) return;
+    loadingMoreRef.current = true;
+    setIsLoadingMore(true);
 
-      const q = searchQuery.trim().toLowerCase();
-      if (!q) return true;
+    try {
+      const nextPage = page + 1;
+      const res = await api.getProducts(buildQueryParams(nextPage));
+      if (Array.isArray(res) && res.length > 0) {
+        setProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => String(p.id || p._id)));
+          const uniqueNew = res.filter((p) => !existingIds.has(String(p.id || p._id)));
+          return [...prev, ...uniqueNew];
+        });
+        setPage(nextPage);
+        if (res.pagination) {
+          setHasMore(Boolean(res.pagination.hasNextPage));
+          setTotalCount(res.pagination.totalItems);
+        } else {
+          setHasMore(false);
+        }
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.warn("Failed to load more products:", err);
+    } finally {
+      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, [page, hasMore, isLoading, isLoadingMore, buildQueryParams]);
 
-      return (
-        item.partNumber?.toLowerCase().includes(q) ||
-        item.category?.toLowerCase().includes(q) ||
-        item.categoryKey?.toLowerCase().includes(q) ||
-        item.description?.toLowerCase().includes(q) ||
-        item.metaTitle?.toLowerCase().includes(q) ||
-        item.metaKeywords?.toLowerCase().includes(q)
-      );
-    });
-  }, [products, selectedCategory, stockFilter, searchQuery]);
+  // 4. Attach IntersectionObserver to sentinel element at bottom of table
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          loadNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "300px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, loadNextPage]);
 
   // Actions
   const handleOpenCreate = () => {
@@ -166,14 +240,19 @@ export default function App() {
   const handleSaveProduct = async (productData) => {
     try {
       if (productData.id) {
-        await api.updateProduct(productData.id, productData);
+        const updated = await api.updateProduct(productData.id, productData);
+        setProducts((prev) =>
+          prev.map((p) =>
+            String(p.id || p._id) === String(productData.id) ? { ...p, ...updated } : p
+          )
+        );
         setToastMessage(`Product "${productData.partNumber}" updated with SEO.`);
       } else {
-        await api.createProduct(productData);
+        const created = await api.createProduct(productData);
+        setProducts((prev) => [created, ...prev]);
+        setTotalCount((prev) => prev + 1);
         setToastMessage(`Product "${productData.partNumber}" created & published.`);
       }
-      const refreshed = await api.getProducts();
-      setProducts(refreshed);
       setIsEditorOpen(false);
       setEditingProduct(null);
     } catch (err) {
@@ -190,8 +269,8 @@ export default function App() {
   const handleConfirmDelete = async (id) => {
     try {
       await api.deleteProduct(id);
-      const refreshed = await api.getProducts();
-      setProducts(refreshed);
+      setProducts((prev) => prev.filter((p) => String(p.id || p._id) !== String(id)));
+      setTotalCount((prev) => Math.max(0, prev - 1));
       setIsDeleteOpen(false);
       setDeletingProduct(null);
       setToastMessage("Product removed from inventory.");
@@ -319,8 +398,12 @@ export default function App() {
         "Reset the entire inventory back to factory defaults? Custom items will be replaced."
       )
     ) {
-      const reset = await api.resetCatalog();
-      setProducts(reset);
+      await api.resetCatalog();
+      const res = await api.getProducts(buildQueryParams(1));
+      setProducts(res);
+      setPage(1);
+      setHasMore(Boolean(res.pagination?.hasNextPage));
+      setTotalCount(res.pagination?.totalItems || res.length);
       setToastMessage("Catalog restored to factory defaults.");
     }
   };
@@ -637,12 +720,12 @@ export default function App() {
                   : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
                   }`}
               >
-                All ({products.length})
+                All ({totalCount || products.length})
               </button>
 
               {(categories.length > 0 ? categories : CATEGORIES).map((cat) => {
                 const catIdentifier = cat.id || cat._id;
-                const count = products.filter((p) => matchCategory(p, catIdentifier)).length;
+                const count = cat.count !== undefined ? cat.count : products.filter((p) => matchCategory(p, catIdentifier)).length;
                 const isSelected = selectedCategory === catIdentifier;
                 const isHidden = Boolean(cat.isHidden);
                 return (
@@ -713,11 +796,12 @@ export default function App() {
         {/* 3. Product Catalog Presentation */}
         {isLoading ? (
           <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] text-xs font-mono text-[#68717A]">
+            <div className="w-6 h-6 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
             Loading product registry...
           </div>
         ) : viewMode === "table" ? (
           <ProductTable
-            products={filteredProducts}
+            products={products}
             categories={categories}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
@@ -725,12 +809,31 @@ export default function App() {
           />
         ) : (
           <ProductCardGrid
-            products={filteredProducts}
+            products={products}
             categories={categories}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
             onToggleVisibility={handleToggleProductVisibility}
           />
+        )}
+
+        {/* 3B. Infinite On-Scroll Sentinel & Status Indicator */}
+        {!isLoading && (
+          <div ref={sentinelRef} className="py-6 flex flex-col items-center justify-center gap-2 select-none">
+            {isLoadingMore && (
+              <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-[#132333]/15 rounded-[3px] shadow-xs text-xs font-mono text-[#A77C3A]">
+                <div className="w-3.5 h-3.5 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin" />
+                <span>Loading more components...</span>
+              </div>
+            )}
+            {!hasMore && products.length > 0 && (
+              <div className="flex items-center gap-2 text-xs font-mono text-[#68717A]/80 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#A77C3A]/60" />
+                <span>Showing all {totalCount || products.length} components &bull; End of catalog</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#A77C3A]/60" />
+              </div>
+            )}
+          </div>
         )}
       </main>
 
