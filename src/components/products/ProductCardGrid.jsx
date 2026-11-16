@@ -23,10 +23,10 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
     return (
       <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] space-y-2">
         <TechnicalIcon name="search" className="w-8 h-8 text-gray-400 mx-auto" />
-        <h3 className="text-sm font-bold uppercase tracking-wider text-[#071522]">
+        <h3 className="text-sm font-heading font-bold uppercase tracking-wider text-[#071522]">
           No Products Found
         </h3>
-        <p className="text-xs text-[#68717A]">
+        <p className="text-xs font-sans font-normal text-[#68717A]">
           Try clearing search filters or add a new product.
         </p>
       </div>
@@ -85,18 +85,18 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
               </div>
 
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#A77C3A]/15 text-[#A77C3A] font-bold rounded-[2px]">
+                <span className="text-[10px] font-sans px-1.5 py-0.2 bg-[#A77C3A]/15 text-[#A77C3A] font-bold rounded-[2px]">
                   {product.category || product.categoryKey}
                 </span>
-                <span className="text-[11px] font-mono text-[#071522] font-bold">
+                <span className="text-[11px] font-stats font-bold text-[#071522]">
                   Stock: {product.stock}
                 </span>
               </div>
 
-              <h4 className="text-xs font-mono font-bold text-[#071522] truncate">
+              <h4 className="text-xs font-heading font-bold text-[#071522] truncate">
                 {product.partNumber}
               </h4>
-              <p className="text-[11px] text-[#68717A] line-clamp-2 mt-1 leading-relaxed">
+              <p className="text-[11px] font-sans font-normal text-[#68717A] line-clamp-2 mt-1 leading-relaxed">
                 {product.description}
               </p>
             </div>

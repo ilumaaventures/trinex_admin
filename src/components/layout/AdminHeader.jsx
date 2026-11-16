@@ -19,7 +19,7 @@ export function AdminHeader({
           <span className="w-2.5 h-2.5 rounded-full bg-[#A77C3A] animate-pulse" />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold uppercase tracking-wider text-white">
+              <h1 className="text-sm font-heading font-bold uppercase tracking-wider text-white">
                 TRINEX SYSTEMS LLP
               </h1>
             </div>

@@ -167,7 +167,7 @@ export function CategoryModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold tracking-wide uppercase">
+                <h2 className="text-base font-heading font-extrabold tracking-wide uppercase">
                   {isEditMode ? `Edit Category: ${categoryToEdit.name}` : "Create New Strategic Category"}
                 </h2>
                 {isEditMode && (
@@ -202,7 +202,7 @@ export function CategoryModal({
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           <form onSubmit={handleSubmit} className="bg-white p-5 border border-[#132333]/15 rounded-[3px] space-y-5 shadow-sm">
             <div className="flex items-center justify-between border-b border-[#132333]/10 pb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
+              <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
                 <TechnicalIcon name={isEditMode ? "edit" : "plus"} className="w-3.5 h-3.5 text-[#A77C3A]" />
                 <span>{isEditMode ? "Category Specifications & Controls" : "Category Details"}</span>
               </h3>
@@ -480,7 +480,7 @@ export function CategoryModal({
           {!isEditMode && categories.length > 0 && (
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
+                <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
                   <TechnicalIcon name="tag" className="w-3.5 h-3.5 text-[#A77C3A]" />
                   <span>All Categories Directory ({categories.length})</span>
                 </h3>

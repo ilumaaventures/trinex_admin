@@ -61,10 +61,10 @@ export function LoginPage({ onLoginSuccess }) {
           </div>
 
           <div>
-            <h1 className="text-lg sm:text-xl font-bold tracking-wider uppercase text-white font-mono">
+            <h1 className="text-lg sm:text-xl font-heading font-extrabold tracking-wider uppercase text-white">
               TRINEX SYSTEMS LLP
             </h1>
-            <p className="text-[11px] font-mono text-[#C29A58] tracking-widest uppercase mt-0.5">
+            <p className="text-[11px] font-sans font-medium text-[#C29A58] tracking-widest uppercase mt-0.5">
               Admin Portal &bull; Inventory Management
             </p>
           </div>
@@ -73,7 +73,7 @@ export function LoginPage({ onLoginSuccess }) {
         {/* Form Body */}
         <div className="p-6 sm:p-8 space-y-5">
           {error && (
-            <div className="p-3 bg-red-950/80 border border-red-500/50 rounded-[4px] text-xs text-red-200 flex items-start gap-2.5 animate-shake">
+            <div className="p-3 bg-red-950/80 border border-red-500/50 rounded-[4px] text-xs font-sans font-medium text-red-200 flex items-start gap-2.5 animate-shake">
               <TechnicalIcon name="alert-triangle" className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -82,7 +82,7 @@ export function LoginPage({ onLoginSuccess }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email / Username Field */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-white/80">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-white/80">
                 Email or Username
               </label>
               <div className="relative">
@@ -97,14 +97,14 @@ export function LoginPage({ onLoginSuccess }) {
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="admin@trinexsystems.in or admin"
                   disabled={isLoading}
-                  className="w-full pl-9 pr-3 py-2.5 bg-[#050E17]/90 border border-white/15 text-xs font-mono rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#A77C3A] focus:ring-1 focus:ring-[#A77C3A] transition-colors"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#050E17]/90 border border-white/15 text-xs font-sans font-normal rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#A77C3A] focus:ring-1 focus:ring-[#A77C3A] transition-colors"
                 />
               </div>
             </div>
 
             {/* Password Field with Eye Toggle */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-white/80">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-white/80">
                 Password
               </label>
               <div className="relative">
@@ -150,7 +150,7 @@ export function LoginPage({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-[#A77C3A] hover:bg-[#C29A58] active:scale-[0.99] text-[#071522] font-mono font-bold text-xs uppercase tracking-wider rounded-[4px] transition-all duration-150 flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                className="w-full py-3 bg-[#A77C3A] hover:bg-[#C29A58] active:scale-[0.99] text-[#071522] font-sans font-semibold text-xs uppercase tracking-wider rounded-[4px] transition-all duration-150 flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-wait"
               >
                 {isLoading ? (
                   <>

@@ -18,7 +18,7 @@ export function DeleteConfirmModal({ isOpen, product, onConfirm, onCancel }) {
               <TechnicalIcon name="alert-triangle" className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold tracking-wide uppercase">
+              <h3 className="text-sm font-heading font-bold tracking-wide uppercase">
                 Confirm Product Removal
               </h3>
               <p className="text-[11px] text-white/50 font-mono">
@@ -41,11 +41,11 @@ export function DeleteConfirmModal({ isOpen, product, onConfirm, onCancel }) {
             Are you sure you want to permanently delete part number:
           </p>
 
-          <div className="p-3 bg-white border border-[#132333]/15 rounded-[2px] font-mono">
-            <div className="text-xs text-[#A77C3A] font-bold">
+          <div className="p-3 bg-white border border-[#132333]/15 rounded-[2px]">
+            <div className="text-xs font-heading font-bold text-[#A77C3A]">
               {product.partNumber}
             </div>
-            <div className="text-xs text-[#68717A] truncate">
+            <div className="text-xs font-sans text-[#68717A] truncate mt-0.5">
               {product.category} &bull; {product.description}
             </div>
           </div>

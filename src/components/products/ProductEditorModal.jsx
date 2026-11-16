@@ -252,7 +252,7 @@ export function ProductEditorModal({
               <TechnicalIcon name="cpu" className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold tracking-wide uppercase">
+              <h2 className="text-base font-heading font-extrabold tracking-wide uppercase">
                 {product?.id ? "Edit Product & SEO Metadata" : "Add New Product with SEO Suite"}
               </h2>
               <p className="text-[11px] text-white/50 font-mono">
@@ -333,12 +333,12 @@ export function ProductEditorModal({
                     value={formData.partNumber}
                     onChange={handleChange}
                     placeholder="e.g. TPP-95-40-400 or 2N2222A"
-                    className={`w-full px-3.5 py-2.5 text-xs font-mono bg-white border ${
+                    className={`w-full px-3.5 py-2.5 text-xs font-sans bg-white border ${
                       errors.partNumber ? "border-red-500" : "border-[#132333]/20"
                     } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]`}
                   />
                   {errors.partNumber && (
-                    <p className="text-[11px] text-red-500 mt-1 font-mono">
+                    <p className="text-[11px] text-red-500 mt-1 font-sans">
                       {errors.partNumber}
                     </p>
                   )}
@@ -589,7 +589,7 @@ export function ProductEditorModal({
             <div className="space-y-5">
               <div className="flex items-center justify-between border-b border-[#132333]/10 pb-3">
                 <div>
-                  <h3 className="text-sm font-bold text-[#071522] uppercase">
+                  <h3 className="text-sm font-heading font-bold text-[#071522] uppercase">
                     Search Engine Optimization (SEO) Metadata
                   </h3>
                   <p className="text-[11px] text-[#68717A]">
