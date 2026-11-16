@@ -39,13 +39,13 @@ export function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#071522] text-[#FAF9F6] flex flex-col justify-center items-center p-4 relative overflow-hidden select-none">
+    <div className="min-h-screen bg-[#315C3C] text-white flex flex-col justify-center items-center p-4 relative overflow-hidden select-none">
       {/* Subtle Radial Glow Backdrops */}
-      <div className="absolute w-[600px] h-[600px] bg-[#A77C3A]/10 rounded-full blur-[140px] pointer-events-none -top-32 -left-32" />
-      <div className="absolute w-[500px] h-[500px] bg-[#A77C3A]/8 rounded-full blur-[140px] pointer-events-none -bottom-32 -right-32" />
+      <div className="absolute w-[600px] h-[600px] bg-[#527C50]/10 rounded-full blur-[140px] pointer-events-none -top-32 -left-32" />
+      <div className="absolute w-[500px] h-[500px] bg-[#527C50]/8 rounded-full blur-[140px] pointer-events-none -bottom-32 -right-32" />
 
       {/* Main Login Card */}
-      <div className="relative z-10 w-full max-w-[440px] bg-[#0D1E2E]/95 border border-[#A77C3A]/30 rounded-[6px] shadow-[0_20px_60px_rgba(0,0,0,0.65)] backdrop-blur-xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-[440px] bg-[#202B25]/95 border border-[#527C50] rounded-[6px] shadow-[0_20px_60px_rgba(0,0,0,0.65)] backdrop-blur-xl overflow-hidden">
         {/* Card Header with Trinex Logo */}
         <div className="pt-8 pb-6 px-6 sm:px-8 text-center border-b border-white/10 space-y-3">
           <div className="flex justify-center mb-1">
@@ -64,7 +64,7 @@ export function LoginPage({ onLoginSuccess }) {
             <h1 className="text-lg sm:text-xl font-heading font-extrabold tracking-wider uppercase text-white">
               TRINEX SYSTEMS LLP
             </h1>
-            <p className="text-[11px] font-sans font-medium text-[#C29A58] tracking-widest uppercase mt-0.5">
+            <p className="text-[11px] font-sans font-medium text-[#527C50] tracking-widest uppercase mt-0.5">
               Admin Portal &bull; Inventory Management
             </p>
           </div>
@@ -97,7 +97,7 @@ export function LoginPage({ onLoginSuccess }) {
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="admin@trinexsystems.in or admin"
                   disabled={isLoading}
-                  className="w-full pl-9 pr-3 py-2.5 bg-[#050E17]/90 border border-white/15 text-xs font-sans font-normal rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#A77C3A] focus:ring-1 focus:ring-[#A77C3A] transition-colors"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#315C3C]/90 border border-white/15 text-xs font-sans font-normal rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#527C50] focus:ring-1 focus:ring-[#527C50] transition-colors"
                 />
               </div>
             </div>
@@ -119,7 +119,7 @@ export function LoginPage({ onLoginSuccess }) {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   disabled={isLoading}
-                  className="w-full pl-9 pr-10 py-2.5 bg-[#050E17]/90 border border-white/15 text-xs font-mono rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#A77C3A] focus:ring-1 focus:ring-[#A77C3A] transition-colors"
+                  className="w-full pl-9 pr-10 py-2.5 bg-[#315C3C]/90 border border-white/15 text-xs font-mono rounded-[4px] text-white placeholder-white/30 focus:outline-none focus:border-[#527C50] focus:ring-1 focus:ring-[#527C50] transition-colors"
                 />
                 <button
                   type="button"
@@ -134,12 +134,12 @@ export function LoginPage({ onLoginSuccess }) {
 
             {/* Remember Me Checkbox */}
             <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-xs font-mono text-white/70 hover:text-white transition-colors">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-sans text-white/70 hover:text-white transition-colors">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded-[2px] accent-[#A77C3A] bg-[#050E17] border-white/20 cursor-pointer"
+                  className="w-3.5 h-3.5 rounded-[2px] accent-[#527C50] bg-[#315C3C] border-white/20 cursor-pointer"
                 />
                 <span>Remember me</span>
               </label>
@@ -150,11 +150,11 @@ export function LoginPage({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-[#A77C3A] hover:bg-[#C29A58] active:scale-[0.99] text-[#071522] font-sans font-semibold text-xs uppercase tracking-wider rounded-[4px] transition-all duration-150 flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                className="w-full py-3 bg-[#527C50] hover:bg-[#527C50] active:scale-[0.99] text-[#202B25] font-sans font-semibold text-xs uppercase tracking-wider rounded-[4px] transition-all duration-150 flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-wait"
               >
                 {isLoading ? (
                   <>
-                    <span className="w-3.5 h-3.5 border-2 border-[#071522] border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>LOGGING IN...</span>
                   </>
                 ) : (

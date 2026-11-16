@@ -14,10 +14,10 @@ export function Toast({ message, onClose, duration = 4000 }) {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-[#071522] text-[#FAF9F6] border border-[#A77C3A]/50 rounded-[3px] shadow-2xl animate-bounce-short text-xs font-mono select-none"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-[#315C3C] text-white border border-[#527C50] rounded-[3px] shadow-2xl animate-bounce-short text-xs font-sans font-medium select-none"
       role="alert"
     >
-      <span className="w-2 h-2 rounded-full bg-[#A77C3A] animate-pulse" />
+      <span className="w-2 h-2 rounded-full bg-[#A6C96A] animate-pulse" />
       <span>{message}</span>
       <button
         type="button"

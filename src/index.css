@@ -5,22 +5,30 @@
   --font-heading: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-stats: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --color-brand-dark: #071522;
-  --color-brand-navy: #0D1D2A;
-  --color-brand-deep: #102636;
-  --color-brand-gold: #A77C3A;
-  --color-brand-gold-light: #C29A58;
-  --color-brand-off-white: #FAF9F6;
-  --color-brand-muted: #68717A;
+  --color-brand-dark: #315C3C;
+  --color-brand-navy: #202B25;
+  --color-brand-deep: #315C3C;
+  --color-brand-gold: #527C50;
+  --color-brand-gold-light: #A6C96A;
+  --color-brand-off-white: #F6F8F5;
+  --color-brand-muted: #68736B;
+  --color-brand-border: #E5EAE4;
 }
 
 /* ==========================================================================
-   TYPOGRAPHY SPECIFICATION:
-   - Main headings: Manrope (weights 700–800)
-   - Body text:     Inter (weights 400–500)
-   - Navigation:    Inter (weights 500–600)
-   - Buttons:       Inter (weight 600)
-   - Statistics:    Manrope (weight 700)
+   TYPOGRAPHY & COLOR SPECIFICATION:
+   - Main background:       #FFFFFF
+   - Alternate sections:    #F6F8F5
+   - Soft green background: #EAF1E8
+   - Primary green:         #527C50
+   - Accent lime:           #A6C96A
+   - Deep accent:           #315C3C
+   - Heading text:          #202B25 (Manrope 700–800)
+   - Body text:             #68736B (Inter 400–500)
+   - Borders:               #E5EAE4
+   - Navigation:            Inter 500–600
+   - Buttons:               Inter 600
+   - Statistics:            Manrope 700
    ========================================================================== */
 
 h1, h2, h3, h4, h5, h6, .font-heading {
@@ -41,19 +49,24 @@ button, .btn {
 }
 
 :root {
-  --brand-dark: #071522;
-  --brand-navy: #0D1D2A;
-  --brand-gold: #A77C3A;
-  --brand-gold-light: #C29A58;
-  --brand-off-white: #FAF9F6;
+  --brand-dark: #315C3C;
+  --brand-navy: #202B25;
+  --brand-gold: #527C50;
+  --brand-gold-light: #A6C96A;
+  --brand-off-white: #F6F8F5;
+  --brand-main-bg: #FFFFFF;
+  --brand-soft-green: #EAF1E8;
+  --brand-border: #E5EAE4;
+  --brand-heading: #202B25;
+  --brand-body: #68736B;
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
-  background-color: var(--brand-off-white);
-  color: #132333;
+  background-color: #F6F8F5;
+  color: #68736B;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -66,8 +79,8 @@ body {
 
 /* Engineering Blueprint Grid */
 .bg-blueprint-grid {
-  background-image: linear-gradient(to right, rgba(167, 124, 58, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(167, 124, 58, 0.07) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(82, 124, 80, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(82, 124, 80, 0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -78,14 +91,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #071522;
+  background: #315C3C;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e3346;
+  background: #527C50;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A77C3A;
+  background: #A6C96A;
 }

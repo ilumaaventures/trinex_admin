@@ -21,12 +21,12 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
 
   if (products.length === 0) {
     return (
-      <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] space-y-2">
+      <div className="p-12 text-center bg-white border border-[#E2EAE0] rounded-[3px] space-y-2">
         <TechnicalIcon name="search" className="w-8 h-8 text-gray-400 mx-auto" />
-        <h3 className="text-sm font-heading font-bold uppercase tracking-wider text-[#071522]">
+        <h3 className="text-sm font-heading font-bold uppercase tracking-wider text-[#263B2D]">
           No Products Found
         </h3>
-        <p className="text-xs font-sans font-normal text-[#68717A]">
+        <p className="text-xs font-sans font-normal text-[#66756A]">
           Try clearing search filters or add a new product.
         </p>
       </div>
@@ -47,12 +47,11 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
         return (
           <div
             key={productId}
-            className={`bg-white border rounded-[3px] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow group ${
-              isEffectivelyHidden ? "border-amber-300 bg-amber-50/20" : "border-[#132333]/15"
-            }`}
+            className={`bg-white border rounded-[3px] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow group ${isEffectivelyHidden ? "border-amber-300 bg-amber-50/20" : "border-[#E2EAE0]"
+              }`}
           >
             <div>
-              <div className="h-36 bg-[#071522]/5 rounded-[2px] overflow-hidden mb-3 border border-[#132333]/10 flex items-center justify-center relative">
+              <div className="h-36 bg-[#345B43]/5 rounded-[2px] overflow-hidden mb-3 border border-[#E2EAE0] flex items-center justify-center relative">
                 {product.image ? (
                   <img
                     src={product.image}
@@ -85,30 +84,29 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
               </div>
 
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-sans px-1.5 py-0.2 bg-[#A77C3A]/15 text-[#A77C3A] font-bold rounded-[2px]">
+                <span className="text-[10px] font-sans px-1.5 py-0.5 bg-[#E8F0E8] text-[#345B43] border border-[#E2EAE0] font-bold rounded-[2px]">
                   {product.category || product.categoryKey}
                 </span>
-                <span className="text-[11px] font-stats font-bold text-[#071522]">
+                <span className="text-[11px] font-stats font-bold text-[#263B2D]">
                   Stock: {product.stock}
                 </span>
               </div>
 
-              <h4 className="text-xs font-heading font-bold text-[#071522] truncate">
+              <h4 className="text-xs font-heading font-bold text-[#263B2D] truncate">
                 {product.partNumber}
               </h4>
-              <p className="text-[11px] font-sans font-normal text-[#68717A] line-clamp-2 mt-1 leading-relaxed">
+              <p className="text-[11px] font-sans font-normal text-[#66756A] line-clamp-2 mt-1 leading-relaxed">
                 {product.description}
               </p>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#132333]/10 flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-[#E2EAE0] flex items-center justify-between">
               {/* Hide / Unhide Toggle */}
               <button
                 type="button"
                 onClick={() => onToggleVisibility?.(productId, product.partNumber, isSelfHidden)}
-                className={`text-[11px] font-bold uppercase inline-flex items-center gap-1 transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none ${
-                  isSelfHidden ? "text-emerald-700 hover:text-emerald-900" : "text-amber-700 hover:text-amber-900"
-                }`}
+                className={`text-[11px] font-bold uppercase inline-flex items-center gap-1 transition-all duration-150 ease-out active:scale-95 cursor-pointer select-none ${isSelfHidden ? "text-emerald-700 hover:text-emerald-900" : "text-amber-700 hover:text-amber-900"
+                  }`}
                 title={isSelfHidden ? "Unhide on main website" : "Hide from main website"}
               >
                 <TechnicalIcon name={isSelfHidden ? "eye" : "eye-off"} className="w-3.5 h-3.5 transition-transform duration-150" />
@@ -119,7 +117,7 @@ export function ProductCardGrid({ products, categories = [], onEdit, onDelete, o
                 <button
                   type="button"
                   onClick={() => onEdit(product)}
-                  className="px-2 py-1 bg-[#071522] text-[#A77C3A] hover:bg-[#0D1D2A] text-[11px] font-bold rounded-[2px] cursor-pointer"
+                  className="px-2 py-1 bg-[#345B43] text-[#6F966B] hover:bg-[#345B43] text-[11px] font-bold rounded-[2px] cursor-pointer"
                 >
                   EDIT &amp; SEO
                 </button>
