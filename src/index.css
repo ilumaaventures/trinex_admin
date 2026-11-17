@@ -4,7 +4,7 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-stats: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-mono: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --color-brand-dark: #315C3C;
   --color-brand-navy: #202B25;
   --color-brand-deep: #315C3C;
@@ -31,7 +31,13 @@
    - Statistics:            Manrope 700
    ========================================================================== */
 
-h1, h2, h3, h4, h5, h6, .font-heading {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
   font-family: var(--font-heading, "Manrope", sans-serif);
 }
 
@@ -40,11 +46,15 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-weight: 700;
 }
 
-body, p, li, .font-body {
+body,
+p,
+li,
+.font-body {
   font-family: var(--font-sans);
 }
 
-button, .btn {
+button,
+.btn {
   font-family: var(--font-sans);
 }
 
@@ -104,12 +114,23 @@ body {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-4px); }
-  40%, 80% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .animate-shake {
   animation: shake 0.4s ease-in-out;
 }
-
