@@ -158,21 +158,21 @@ export function CategoryModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#FAF9F6] border border-[#132333]/20 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
+      <div className="bg-white border border-[#E5EAE4] w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
         {/* Header */}
-        <div className="bg-[#071522] text-white px-6 py-4 flex items-center justify-between border-b border-white/10 flex-shrink-0">
+        <div className="bg-[#315C3C] text-white px-6 py-4 flex items-center justify-between border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[2px] bg-[#A77C3A]/20 border border-[#A77C3A]/40 flex items-center justify-center text-[#A77C3A]">
+            <div className="w-8 h-8 rounded-[2px] bg-[#527C50]/20 border border-[#527C50] flex items-center justify-center text-[#527C50]">
               <TechnicalIcon name={isEditMode ? "edit" : "folder-plus"} className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold tracking-wide uppercase">
+                <h2 className="text-base font-heading font-extrabold tracking-wide uppercase">
                   {isEditMode ? `Edit Category: ${categoryToEdit.name}` : "Create New Strategic Category"}
                 </h2>
                 {isEditMode && (
                   <span
-                    className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded ${
+                    className={`text-[9px] font-sans font-semibold px-2 py-0.5 rounded ${
                       isHidden ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                     }`}
                   >
@@ -180,7 +180,7 @@ export function CategoryModal({
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-white/50 font-mono">
+              <p className="text-[11px] text-white/70 font-sans">
                 {isEditMode
                   ? "EDIT SPECIFICATIONS • BANNER ASSET • TOGGLE WEBSITE VISIBILITY • DELETE"
                   : "CREATE CATEGORIES • CLOUDINARY ASSETS • CONTROL MAIN WEBSITE VISIBILITY"}
@@ -200,14 +200,14 @@ export function CategoryModal({
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
-          <form onSubmit={handleSubmit} className="bg-white p-5 border border-[#132333]/15 rounded-[3px] space-y-5 shadow-sm">
-            <div className="flex items-center justify-between border-b border-[#132333]/10 pb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
-                <TechnicalIcon name={isEditMode ? "edit" : "plus"} className="w-3.5 h-3.5 text-[#A77C3A]" />
+          <form onSubmit={handleSubmit} className="bg-white p-5 border border-[#E5EAE4] rounded-[3px] space-y-5 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#E5EAE4] pb-2">
+              <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-[#202B25] flex items-center gap-2">
+                <TechnicalIcon name={isEditMode ? "edit" : "plus"} className="w-3.5 h-3.5 text-[#527C50]" />
                 <span>{isEditMode ? "Category Specifications & Controls" : "Category Details"}</span>
               </h3>
               {currentSlug && (
-                <span className="text-[10px] font-mono text-[#132333]/60 bg-[#FAF9F6] px-2 py-0.5 rounded border border-[#132333]/10">
+                <span className="text-[10px] font-mono text-[#202B25]/60 bg-[#F6F8F5] px-2 py-0.5 rounded border border-[#E5EAE4]">
                   SYSTEM KEY: {currentSlug}
                 </span>
               )}
@@ -221,25 +221,25 @@ export function CategoryModal({
             )}
 
             {/* Website Visibility Toggle Bar */}
-            <div className="p-3.5 bg-[#FAF9F6] border border-[#132333]/15 rounded-[3px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="p-3.5 bg-[#F6F8F5] border border-[#E5EAE4] rounded-[3px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#071522]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#202B25]">
                     Website Visibility Status:
                   </span>
                   {isHidden ? (
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 inline-flex items-center gap-1">
+                    <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 inline-flex items-center gap-1">
                       <TechnicalIcon name="eye-off" className="w-3 h-3 text-amber-700" />
                       <span>HIDDEN FROM WEBSITE</span>
                     </span>
                   ) : (
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 inline-flex items-center gap-1">
+                    <span className="text-[10px] font-sans font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 inline-flex items-center gap-1">
                       <TechnicalIcon name="eye" className="w-3 h-3 text-emerald-700" />
                       <span>LIVE ON WEBSITE</span>
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-[#132333]/60 mt-1">
+                <p className="text-[11px] text-[#202B25]/60 mt-1">
                   {isHidden
                     ? "This category and all its products are hidden from public website visitors."
                     : "This category and its products are publicly visible on the main website."}
@@ -253,7 +253,7 @@ export function CategoryModal({
                   className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all duration-150 active:scale-95 select-none flex items-center gap-1.5 cursor-pointer ${
                     !isHidden
                       ? "bg-emerald-600 border-emerald-700 text-white shadow-xs"
-                      : "bg-white border-[#132333]/20 text-[#132333]/70 hover:bg-emerald-50 hover:text-emerald-800"
+                      : "bg-white border-[#E5EAE4] text-[#202B25]/70 hover:bg-emerald-50 hover:text-emerald-800"
                   }`}
                 >
                   <TechnicalIcon name="eye" className="w-3.5 h-3.5" />
@@ -265,7 +265,7 @@ export function CategoryModal({
                   className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] border transition-all duration-150 active:scale-95 select-none flex items-center gap-1.5 cursor-pointer ${
                     isHidden
                       ? "bg-amber-600 border-amber-700 text-white shadow-xs"
-                      : "bg-white border-[#132333]/20 text-[#132333]/70 hover:bg-amber-50 hover:text-amber-800"
+                      : "bg-white border-[#E5EAE4] text-[#202B25]/70 hover:bg-amber-50 hover:text-amber-800"
                   }`}
                 >
                   <TechnicalIcon name="eye-off" className="w-3.5 h-3.5" />
@@ -277,7 +277,7 @@ export function CategoryModal({
             {/* Category Name & Subtitle */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#132333]/80 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]/80 mb-1">
                   Category Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -285,12 +285,12 @@ export function CategoryModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. TRANSFORMERS, RESISTORS, RF & MICROWAVE"
-                  className="w-full px-3 py-2 bg-[#FAF9F6] border border-[#132333]/20 text-xs font-semibold rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                  className="w-full px-3 py-2 bg-[#F6F8F5] border border-[#E5EAE4] text-xs font-semibold rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#132333]/80 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]/80 mb-1">
                   Subtitle / Specialization
                 </label>
                 <input
@@ -298,7 +298,7 @@ export function CategoryModal({
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
                   placeholder="e.g. High-Frequency Pulse Transformers & Chokes"
-                  className="w-full px-3 py-2 bg-[#FAF9F6] border border-[#132333]/20 text-xs rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                  className="w-full px-3 py-2 bg-[#F6F8F5] border border-[#E5EAE4] text-xs rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                 />
               </div>
             </div>
@@ -306,7 +306,7 @@ export function CategoryModal({
             {/* Custom Category Key & Description */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#132333]/80 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]/80 mb-1">
                   Category Key / Slug
                 </label>
                 <input
@@ -314,15 +314,15 @@ export function CategoryModal({
                   value={customSlug}
                   onChange={(e) => setCustomSlug(e.target.value)}
                   placeholder={currentSlug || "Auto-generated from name"}
-                  className="w-full px-3 py-2 bg-[#FAF9F6] border border-[#132333]/20 text-xs font-mono rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                  className="w-full px-3 py-2 bg-[#F6F8F5] border border-[#E5EAE4] text-xs font-mono rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                 />
-                <p className="text-[10px] text-[#132333]/50 mt-1 font-mono">
+                <p className="text-[10px] text-[#202B25]/50 mt-1 font-mono">
                   Used for product matching and URL deep-linking (e.g. #/products?category={currentSlug || "slug"})
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#132333]/80 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]/80 mb-1">
                   Description / Strategic Scope
                 </label>
                 <textarea
@@ -330,25 +330,25 @@ export function CategoryModal({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="High-reliability military-spec electronic assemblies for tactical applications."
-                  className="w-full px-3 py-2 bg-[#FAF9F6] border border-[#132333]/20 text-xs rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A] resize-none"
+                  className="w-full px-3 py-2 bg-[#F6F8F5] border border-[#E5EAE4] text-xs rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50] resize-none"
                 />
               </div>
             </div>
 
             {/* Representative Image Asset */}
-            <div className="space-y-3 border-t border-[#132333]/10 pt-4">
+            <div className="space-y-3 border-t border-[#E5EAE4] pt-4">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#132333]/80">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]/80">
                   Category Banner Image Asset
                 </label>
-                <span className="text-[10px] font-mono text-[#A77C3A]">
+                <span className="text-[10px] font-mono text-[#527C50]">
                   Upload custom asset, paste URL, or select preset
                 </span>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 {/* Image preview */}
-                <div className="w-28 h-20 rounded-[3px] border border-[#132333]/20 overflow-hidden bg-[#071522]/5 flex-shrink-0 relative group shadow-2xs">
+                <div className="w-28 h-20 rounded-[3px] border border-[#E5EAE4] overflow-hidden bg-[#315C3C]/5 flex-shrink-0 relative group shadow-2xs">
                   <img
                     src={image}
                     alt="Category banner"
@@ -368,8 +368,8 @@ export function CategoryModal({
                 {/* Upload & URL input */}
                 <div className="flex-1 space-y-2 w-full">
                   <div className="flex flex-wrap items-center gap-2">
-                    <label className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#FAF9F6] hover:bg-[#F2EFE9] border border-[#132333]/20 rounded-[2px] text-xs font-bold text-[#071522] cursor-pointer transition-colors shadow-2xs">
-                      <TechnicalIcon name="upload" className="w-3.5 h-3.5 text-[#A77C3A]" />
+                    <label className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#F6F8F5] hover:bg-[#F6F8F5] border border-[#E5EAE4] rounded-[2px] text-xs font-bold text-[#202B25] cursor-pointer transition-colors shadow-2xs">
+                      <TechnicalIcon name="upload" className="w-3.5 h-3.5 text-[#527C50]" />
                       <span>{isUploading ? "Uploading to Cloudinary..." : "Upload New Image"}</span>
                       <input
                         type="file"
@@ -379,7 +379,7 @@ export function CategoryModal({
                         className="hidden"
                       />
                     </label>
-                    <span className="text-[11px] text-[#132333]/40">or enter image URL:</span>
+                    <span className="text-[11px] text-[#202B25]/40">or enter image URL:</span>
                   </div>
 
                   <input
@@ -387,14 +387,14 @@ export function CategoryModal({
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
                     placeholder="https://... or /assets/products/..."
-                    className="w-full px-3 py-1.5 bg-[#FAF9F6] border border-[#132333]/20 text-xs font-mono rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-1.5 bg-[#F6F8F5] border border-[#E5EAE4] text-xs font-mono rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
               </div>
 
               {/* Preset Image Options */}
               <div className="pt-2">
-                <span className="text-[10px] font-mono text-[#132333]/60 uppercase block mb-1.5">
+                <span className="text-[10px] font-mono text-[#202B25]/60 uppercase block mb-1.5">
                   Or Select a Preset Image:
                 </span>
                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
@@ -405,11 +405,11 @@ export function CategoryModal({
                       onClick={() => setImage(preset.path)}
                       className={`p-1 border rounded-[2px] transition-all text-center cursor-pointer ${
                         image === preset.path
-                          ? "border-[#A77C3A] ring-2 ring-[#A77C3A] bg-amber-50/40"
-                          : "border-[#132333]/15 hover:border-[#A77C3A]/50 opacity-75 hover:opacity-100 bg-[#FAF9F6]"
+                          ? "border-[#527C50] ring-2 ring-[#527C50] bg-amber-50/40"
+                          : "border-[#E5EAE4] hover:border-[#527C50] opacity-75 hover:opacity-100 bg-[#F6F8F5]"
                       }`}
                     >
-                      <div className="w-full h-8 bg-[#071522]/10 rounded-[2px] overflow-hidden">
+                      <div className="w-full h-8 bg-[#315C3C]/10 rounded-[2px] overflow-hidden">
                         <img
                           src={preset.path}
                           alt={preset.label}
@@ -426,7 +426,7 @@ export function CategoryModal({
             </div>
 
             {/* Bottom Actions Row */}
-            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-[#132333]/10">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-[#E5EAE4]">
               {/* Delete Button (Available in Edit Mode) */}
               {isEditMode ? (
                 <button
@@ -480,11 +480,11 @@ export function CategoryModal({
           {!isEditMode && categories.length > 0 && (
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#071522] flex items-center gap-2">
-                  <TechnicalIcon name="tag" className="w-3.5 h-3.5 text-[#A77C3A]" />
+                <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-[#202B25] flex items-center gap-2">
+                  <TechnicalIcon name="tag" className="w-3.5 h-3.5 text-[#527C50]" />
                   <span>All Categories Directory ({categories.length})</span>
                 </h3>
-                <span className="text-[11px] text-[#132333]/60 font-mono">
+                <span className="text-[11px] text-[#202B25]/60 font-mono">
                   Select a category to view or modify
                 </span>
               </div>
@@ -496,11 +496,11 @@ export function CategoryModal({
                     <div
                       key={cat.id}
                       className={`p-3 border rounded-[3px] flex items-start justify-between gap-3 shadow-2xs transition-colors ${
-                        catIsHidden ? "bg-amber-50/50 border-amber-300" : "bg-white border-[#132333]/15"
+                        catIsHidden ? "bg-amber-50/50 border-amber-300" : "bg-white border-[#E5EAE4]"
                       }`}
                     >
                       <div className="flex items-start gap-2.5 min-w-0">
-                        <div className="w-10 h-10 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative">
+                        <div className="w-10 h-10 rounded-[2px] overflow-hidden bg-[#315C3C]/5 flex-shrink-0 border border-[#E5EAE4] relative">
                           <img
                             src={cat.image || "/assets/products/transformers_chokes.jpg"}
                             alt={cat.name}
@@ -508,17 +508,17 @@ export function CategoryModal({
                           />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-xs text-[#071522] truncate uppercase">
+                          <h4 className="font-bold text-xs text-[#202B25] truncate uppercase">
                             {cat.name}
                           </h4>
-                          <span className="text-[10px] font-mono text-[#132333]/60">
+                          <span className="text-[10px] font-mono text-[#202B25]/60">
                             {cat.count ?? 0} items &bull; KEY: {cat.id}
                           </span>
                         </div>
                       </div>
 
                       <span
-                        className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${
+                        className={`text-[9px] font-sans font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ${
                           catIsHidden ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-emerald-100 text-emerald-900 border border-emerald-300"
                         }`}
                       >

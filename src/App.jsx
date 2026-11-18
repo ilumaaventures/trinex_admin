@@ -253,6 +253,9 @@ export default function App() {
         setTotalCount((prev) => prev + 1);
         setToastMessage(`Product "${productData.partNumber}" created & published.`);
       }
+      api.getCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) setCategories(cats);
+      }).catch(() => { });
       setIsEditorOpen(false);
       setEditingProduct(null);
     } catch (err) {
@@ -271,6 +274,9 @@ export default function App() {
       await api.deleteProduct(id);
       setProducts((prev) => prev.filter((p) => String(p.id || p._id) !== String(id)));
       setTotalCount((prev) => Math.max(0, prev - 1));
+      api.getCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) setCategories(cats);
+      }).catch(() => { });
       setIsDeleteOpen(false);
       setDeletingProduct(null);
       setToastMessage("Product removed from inventory.");
@@ -404,6 +410,8 @@ export default function App() {
       setPage(1);
       setHasMore(Boolean(res.pagination?.hasNextPage));
       setTotalCount(res.pagination?.totalItems || res.length);
+      const refreshedCats = await api.getCategories();
+      if (Array.isArray(refreshedCats) && refreshedCats.length > 0) setCategories(refreshedCats);
       setToastMessage("Catalog restored to factory defaults.");
     }
   };
@@ -490,9 +498,9 @@ export default function App() {
   // Auth Checking Loading Screen
   if (isAuthChecking) {
     return (
-      <div className="min-h-screen bg-[#071522] text-[#FAF9F6] flex flex-col justify-center items-center font-mono select-none">
-        <div className="w-9 h-9 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin mb-4" />
-        <span className="text-xs tracking-widest text-[#C29A58] uppercase font-bold">
+      <div className="min-h-screen bg-[#345B43] text-white flex flex-col justify-center items-center font-mono select-none">
+        <div className="w-9 h-9 border-2 border-[#6F966B] border-t-transparent rounded-full animate-spin mb-4" />
+        <span className="text-xs tracking-widest text-[#6F966B] uppercase font-bold">
           Verifying Security Credentials...
         </span>
         <span className="text-[10px] text-white/40 mt-1 uppercase tracking-wider">
@@ -515,7 +523,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#132333] flex flex-col antialiased">
+    <div className="min-h-screen bg-[#F5F8F4] text-[#263B2D] flex flex-col antialiased">
       {/* 1. Subdomain Header */}
       <AdminHeader
         onExportExcel={handleExportExcel}
@@ -526,14 +534,14 @@ export default function App() {
       {/* 2. Main Dashboard Area */}
       <main className="flex-1 max-w-[1820px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {/* Category Visibility Control Bar */}
-        <div className="bg-white p-4 sm:p-5 rounded-[3px] border border-[#132333]/15 shadow-sm space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#132333]/10 pb-2.5">
+        <div className="bg-white p-4 sm:p-5 rounded-[3px] border border-[#E2EAE0] shadow-sm space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2EAE0] pb-2.5">
             <div className="flex items-center gap-2">
-              <TechnicalIcon name="tag" className="w-4 h-4 text-[#A77C3A]" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#071522]">
+              <TechnicalIcon name="tag" className="w-4 h-4 text-[#6F966B]" />
+              <h2 className="text-xs font-heading font-bold uppercase tracking-wider text-[#263B2D]">
                 Strategic Categories &amp; Website Visibility Control
               </h2>
-              <span className="text-[10px] font-mono text-[#132333]/50 hidden md:inline">
+              <span className="text-[10px] font-sans font-normal text-[#263B2D]/50 hidden md:inline">
                 &bull; Click any category card to edit details &amp; delete, or click Hide/Unhide for 1-click toggle
               </span>
             </div>
@@ -541,12 +549,12 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleOpenCreateCategory}
-                className="px-2.5 py-1 bg-[#A77C3A]/20 hover:bg-[#A77C3A]/30 text-[#A77C3A] hover:text-[#071522] border border-[#A77C3A]/40 text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-2.5 py-1 bg-[#6F966B]/20 hover:bg-[#6F966B]/30 text-[#6F966B] hover:text-[#263B2D] border border-[#6F966B] text-xs font-sans font-semibold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <TechnicalIcon name="folder-plus" className="w-3.5 h-3.5" />
                 <span>Create Category</span>
               </button>
-              <span className="text-[11px] font-mono text-[#A77C3A] font-bold">
+              <span className="text-[11px] font-stats font-bold text-[#6F966B]">
                 {categories.filter((c) => !c.isHidden).length} / {categories.length} LIVE ON WEBSITE
               </span>
             </div>
@@ -556,7 +564,10 @@ export default function App() {
             {categories.map((cat) => {
               const catIdentifier = cat.id || cat._id;
               const isHidden = Boolean(cat.isHidden);
-              const productCount = products.filter((p) => matchCategory(p, catIdentifier)).length;
+              const productCount =
+                cat.count !== undefined
+                  ? cat.count
+                  : products.filter((p) => matchCategory(p, catIdentifier)).length;
               return (
                 <div
                   key={catIdentifier}
@@ -566,12 +577,12 @@ export default function App() {
                   }}
                   className={`group p-2.5 rounded-[3px] border transition-all duration-200 ease-in-out flex items-center justify-between gap-2 cursor-pointer shadow-2xs hover:shadow-md select-none ${isHidden
                     ? "bg-amber-50/70 border-amber-300 hover:border-amber-400"
-                    : "bg-[#FAF9F6] border-[#132333]/12 hover:border-[#A77C3A] hover:bg-white"
+                    : "bg-white border-[#E2EAE0] hover:border-[#6F966B] hover:bg-white"
                     }`}
                   title="Click to edit category details or delete"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#071522]/5 flex-shrink-0 border border-[#132333]/10 relative group-hover:scale-105 transition-transform duration-200">
+                    <div className="w-9 h-9 rounded-[2px] overflow-hidden bg-[#345B43]/5 flex-shrink-0 border border-[#E2EAE0] relative group-hover:scale-105 transition-transform duration-200">
                       <img
                         src={cat.image || "/assets/products/transformers_chokes.jpg"}
                         alt={cat.name}
@@ -585,22 +596,21 @@ export default function App() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1">
-                        <span className="font-bold text-xs uppercase truncate block text-[#071522] group-hover:text-[#A77C3A] transition-colors">
+                        <span className="font-heading font-bold text-xs uppercase truncate block text-[#263B2D] group-hover:text-[#6F966B] transition-colors">
                           {cat.name}
                         </span>
-                        <TechnicalIcon name="edit" className="w-2.5 h-2.5 text-[#A77C3A] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                        <TechnicalIcon name="edit" className="w-2.5 h-2.5 text-[#6F966B] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[10px] font-mono text-[#132333]/60">
+                        <span className="text-[10px] font-stats font-bold text-[#263B2D]/70">
                           {productCount} items
                         </span>
                         <span>&bull;</span>
                         <span
-                          className={`text-[9px] font-mono font-bold px-1 py-0.2 rounded border transition-colors duration-200 ${
-                            isHidden
-                              ? "text-amber-800 bg-amber-100/70 border-amber-200"
-                              : "text-emerald-800 bg-emerald-100/70 border-emerald-200"
-                          }`}
+                          className={`text-[9px] font-sans font-semibold px-1 py-0.2 rounded border transition-colors duration-200 ${isHidden
+                            ? "text-amber-800 bg-amber-100/70 border-amber-200"
+                            : "text-emerald-800 bg-emerald-100/70 border-emerald-200"
+                            }`}
                         >
                           {isHidden ? "HIDDEN" : "LIVE"}
                         </span>
@@ -618,7 +628,7 @@ export default function App() {
                         handleOpenEditCategory(cat);
                       }}
                       title="Edit Category Details & Banner"
-                      className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] bg-white hover:bg-[#A77C3A] hover:text-white text-[#071522] border border-[#132333]/15 transition-all duration-150 active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
+                      className="px-2 py-0.5 text-[9px] font-sans font-semibold uppercase rounded-[2px] bg-white hover:bg-[#6F966B] hover:text-white text-[#263B2D] border border-[#E2EAE0] transition-all duration-150 active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
                     >
                       <TechnicalIcon name="edit" className="w-2.5 h-2.5" />
                       <span>Edit</span>
@@ -632,11 +642,10 @@ export default function App() {
                         handleToggleCategoryVisibility(catIdentifier, cat.name, isHidden);
                       }}
                       title={isHidden ? "Unhide category on main website" : "Hide category from main website"}
-                      className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-[2px] transition-all duration-150 ease-out active:scale-95 flex items-center gap-1 cursor-pointer select-none ${
-                        isHidden
-                          ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                          : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
-                      }`}
+                      className={`px-2 py-0.5 text-[9px] font-sans font-semibold uppercase rounded-[2px] transition-all duration-150 ease-out active:scale-95 flex items-center gap-1 cursor-pointer select-none ${isHidden
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                        : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
+                        }`}
                     >
                       <TechnicalIcon
                         name={isHidden ? "eye" : "eye-off"}
@@ -652,20 +661,20 @@ export default function App() {
         </div>
 
         {/* Toolbar & Filters */}
-        <div className="bg-white p-4 sm:p-5 rounded-[3px] border border-[#132333]/15 shadow-sm space-y-4">
+        <div className="bg-white p-4 sm:p-5 rounded-[3px] border border-[#E2EAE0] shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             {/* Search Bar */}
             <div className="relative flex-1">
               <TechnicalIcon
                 name="search"
-                className="w-4 h-4 text-[#68717A] absolute left-3 top-1/2 -translate-y-1/2"
+                className="w-4 h-4 text-[#66756A] absolute left-3 top-1/2 -translate-y-1/2"
               />
               <input
                 type="text"
                 placeholder="Search SKU, category, specs, meta keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 text-xs bg-[#FAF9F6] border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                className="w-full pl-9 pr-4 py-2.5 text-xs bg-white border border-[#E2EAE0] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#6F966B]"
               />
               {searchQuery && (
                 <button
@@ -683,16 +692,16 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsCategoryModalOpen(true)}
-                className="px-3.5 py-2.5 bg-[#071522] hover:bg-[#132333] text-[#A77C3A] border border-[#A77C3A]/40 text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-2 shadow-sm font-mono cursor-pointer"
+                className="px-3.5 py-2.5 bg-[#345B43] hover:bg-[#345B43] text-[#6F966B] border border-[#6F966B] text-xs font-sans font-semibold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
               >
-                <TechnicalIcon name="folder-plus" className="w-4 h-4 text-[#A77C3A]" />
+                <TechnicalIcon name="folder-plus" className="w-4 h-4 text-[#6F966B]" />
                 <span>CREATE CATEGORY</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleOpenCreate}
-                className="px-4 py-2.5 bg-[#A77C3A] hover:bg-[#C29A58] text-[#071522] text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-2 shadow-sm font-mono cursor-pointer"
+                className="px-4 py-2.5 bg-[#6F966B] hover:bg-[#345B43] text-white text-xs font-sans font-semibold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
               >
                 <TechnicalIcon name="plus" className="w-4 h-4" />
                 <span>ADD PRODUCT</span>
@@ -701,7 +710,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleResetCatalog}
-                className="px-3 py-2.5 border border-[#132333]/20 hover:border-red-400 text-xs text-[#68717A] hover:text-red-600 font-bold uppercase tracking-wider rounded-[2px] transition-colors font-mono cursor-pointer"
+                className="px-3 py-2.5 border border-[#E2EAE0] hover:border-red-400 text-xs text-[#66756A] hover:text-red-600 font-sans font-semibold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                 title="Restore factory catalog defaults"
               >
                 RESET CATALOG
@@ -710,14 +719,14 @@ export default function App() {
           </div>
 
           {/* Category Filter Pills & View Toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#132333]/10">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#E2EAE0]">
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <button
                 type="button"
                 onClick={() => setSelectedCategory("all")}
-                className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer ${selectedCategory === "all"
-                  ? "bg-[#071522] text-[#A77C3A] font-bold"
-                  : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
+                className={`px-2.5 py-1 rounded-[2px] font-sans font-semibold uppercase text-[11px] transition-colors cursor-pointer ${selectedCategory === "all"
+                  ? "bg-[#345B43] text-[#A6C96A] font-bold"
+                  : "bg-[#E8F0E8]/60 text-[#66756A] hover:text-[#263B2D] border border-[#E2EAE0]"
                   }`}
               >
                 All ({totalCount || products.length})
@@ -733,16 +742,15 @@ export default function App() {
                     key={catIdentifier}
                     type="button"
                     onClick={() => setSelectedCategory(isSelected ? "all" : catIdentifier)}
-                    className={`px-2.5 py-1 rounded-[2px] font-mono uppercase text-[11px] transition-colors cursor-pointer flex items-center gap-1.5 ${
-                      isSelected
-                        ? "bg-[#071522] text-[#A77C3A] font-bold"
-                        : isHidden
+                    className={`px-2.5 py-1 rounded-[2px] font-sans font-semibold uppercase text-[11px] transition-colors cursor-pointer flex items-center gap-1.5 ${isSelected
+                      ? "bg-[#345B43] text-[#A6C96A] font-bold"
+                      : isHidden
                         ? "bg-amber-50 text-amber-900 border border-amber-300 hover:border-amber-400"
-                        : "bg-[#FAF9F6] text-[#68717A] hover:text-[#071522] border border-[#132333]/10"
-                    }`}
+                        : "bg-[#E8F0E8]/60 text-[#66756A] hover:text-[#263B2D] border border-[#E2EAE0]"
+                      }`}
                   >
                     <span>{cat.name}</span>
-                    <span className="opacity-70">({count})</span>
+                    <span className="opacity-70 font-stats font-bold">({count})</span>
                     {isHidden && (
                       <span className="text-[9px] text-amber-700 font-bold ml-0.5">
                         [HIDDEN]
@@ -758,21 +766,21 @@ export default function App() {
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value)}
-                className="px-2.5 py-1 text-xs bg-[#FAF9F6] border border-[#132333]/20 rounded-[2px] text-[#071522] font-mono"
+                className="px-2.5 py-1 text-xs bg-white border border-[#E2EAE0] rounded-[2px] text-[#263B2D] font-sans font-medium"
               >
                 <option value="all">All Locations</option>
                 <option value="delhi">Delhi Stock Only</option>
                 <option value="low">Low Stock (&le; 5)</option>
               </select>
 
-              <div className="flex items-center border border-[#132333]/20 rounded-[2px] overflow-hidden">
+              <div className="flex items-center border border-[#E2EAE0] rounded-[2px] overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 cursor-pointer ${viewMode === "table"
-                    ? "bg-[#071522] text-[#A77C3A]"
-                    : "bg-white text-[#68717A]"
-                    }`}
+                  className={`p-1.5 cursor - pointer ${viewMode === "table"
+                    ? "bg-[#345B43] text-[#6F966B]"
+                    : "bg-white text-[#66756A]"
+                    } `}
                   title="Table view"
                 >
                   <TechnicalIcon name="layers" className="w-3.5 h-3.5" />
@@ -780,10 +788,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setViewMode("cards")}
-                  className={`p-1.5 cursor-pointer ${viewMode === "cards"
-                    ? "bg-[#071522] text-[#A77C3A]"
-                    : "bg-white text-[#68717A]"
-                    }`}
+                  className={`p - 1.5 cursor - pointer ${viewMode === "cards"
+                    ? "bg-[#345B43] text-[#6F966B]"
+                    : "bg-white text-[#66756A]"
+                    } `}
                   title="Card grid view"
                 >
                   <TechnicalIcon name="grid" className="w-3.5 h-3.5" />
@@ -795,8 +803,8 @@ export default function App() {
 
         {/* 3. Product Catalog Presentation */}
         {isLoading ? (
-          <div className="p-12 text-center bg-white border border-[#132333]/10 rounded-[3px] text-xs font-mono text-[#68717A]">
-            <div className="w-6 h-6 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <div className="p-12 text-center bg-white border border-[#E2EAE0] rounded-[3px] text-xs font-mono text-[#66756A]">
+            <div className="w-6 h-6 border-2 border-[#6F966B] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
             Loading product registry...
           </div>
         ) : viewMode === "table" ? (
@@ -821,16 +829,16 @@ export default function App() {
         {!isLoading && (
           <div ref={sentinelRef} className="py-6 flex flex-col items-center justify-center gap-2 select-none">
             {isLoadingMore && (
-              <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-[#132333]/15 rounded-[3px] shadow-xs text-xs font-mono text-[#A77C3A]">
-                <div className="w-3.5 h-3.5 border-2 border-[#A77C3A] border-t-transparent rounded-full animate-spin" />
+              <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-[#E2EAE0] rounded-[3px] shadow-xs text-xs font-mono text-[#6F966B]">
+                <div className="w-3.5 h-3.5 border-2 border-[#6F966B] border-t-transparent rounded-full animate-spin" />
                 <span>Loading more components...</span>
               </div>
             )}
             {!hasMore && products.length > 0 && (
-              <div className="flex items-center gap-2 text-xs font-mono text-[#68717A]/80 py-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#A77C3A]/60" />
+              <div className="flex items-center gap-2 text-xs font-mono text-[#66756A]/80 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6F966B]/60" />
                 <span>Showing all {totalCount || products.length} components &bull; End of catalog</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#A77C3A]/60" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6F966B]/60" />
               </div>
             )}
           </div>
@@ -839,7 +847,7 @@ export default function App() {
 
       {/* 4. Product Editor Modal with full SEO suite */}
       <ProductEditorModal
-        key={editingProduct ? `edit-${editingProduct.id}` : (isEditorOpen ? "new-product" : "closed")}
+        key={editingProduct ? `edit - ${editingProduct.id} ` : (isEditorOpen ? "new-product" : "closed")}
         isOpen={isEditorOpen}
         product={editingProduct}
         categories={categories}

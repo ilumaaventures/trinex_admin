@@ -22,15 +22,15 @@ export function SeoPreview({
   return (
     <div className="space-y-6">
       {/* 1. Google Search Result Preview */}
-      <div className="p-4 rounded-[3px] bg-white border border-[#132333]/15 shadow-sm">
+      <div className="p-4 rounded-[3px] bg-white border border-[#E5EAE4] shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#34A853]" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#68717A] font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#68736B] font-semibold">
               Google Search Result (SERP) Preview
             </span>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 bg-[#FAF9F6] border border-[#132333]/10 text-[#68717A] rounded-[2px]">
+          <span className="text-[10px] font-mono px-2 py-0.5 bg-[#F6F8F5] border border-[#E5EAE4] text-[#68736B] rounded-[2px]">
             Desktop &amp; Mobile
           </span>
         </div>
@@ -38,7 +38,7 @@ export function SeoPreview({
         <div className="font-sans max-w-xl space-y-1">
           {/* Breadcrumb URL */}
           <div className="flex items-center gap-1.5 text-xs text-[#202124]">
-            <span className="w-4 h-4 rounded-full bg-[#071522] flex items-center justify-center text-[9px] text-[#A77C3A] font-bold">
+            <span className="w-4 h-4 rounded-full bg-[#315C3C] flex items-center justify-center text-[9px] text-[#527C50] font-bold">
               T
             </span>
             <span className="text-[12px] text-[#202124] truncate">
@@ -79,15 +79,15 @@ export function SeoPreview({
       </div>
 
       {/* 2. Open Graph Card Preview */}
-      <div className="p-4 rounded-[3px] bg-white border border-[#132333]/15 shadow-sm">
+      <div className="p-4 rounded-[3px] bg-white border border-[#E5EAE4] shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#1877F2]" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#68717A] font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#68736B] font-semibold">
               Open Graph (LinkedIn / Social Media) Card
             </span>
           </div>
-          <span className="text-[10px] font-mono text-[#68717A]">og:type: product</span>
+          <span className="text-[10px] font-mono text-[#68736B]">og:type: product</span>
         </div>
 
         <div className="max-w-md border border-gray-200 rounded-[4px] overflow-hidden bg-gray-50">
@@ -101,7 +101,7 @@ export function SeoPreview({
             ) : (
               <span className="text-xs text-gray-400 font-mono">No Social Image</span>
             )}
-            <span className="absolute bottom-2 left-2 bg-[#071522]/90 text-[#A77C3A] font-mono text-[9px] px-2 py-0.5 uppercase tracking-wider rounded-[2px]">
+            <span className="absolute bottom-2 left-2 bg-[#315C3C]/90 text-[#527C50] font-mono text-[9px] px-2 py-0.5 uppercase tracking-wider rounded-[2px]">
               TRINEX SYSTEMS
             </span>
           </div>
@@ -110,7 +110,7 @@ export function SeoPreview({
             <span className="text-[10px] uppercase font-mono tracking-wider text-gray-500 block truncate">
               {displayUrl.replace(/^https?:\/\//, "")}
             </span>
-            <h5 className="text-[13px] font-semibold text-[#071522] line-clamp-1">
+            <h5 className="text-[13px] font-semibold text-[#202B25] line-clamp-1">
               {ogTitle || displayTitle}
             </h5>
             <p className="text-[11px] text-gray-600 line-clamp-2 leading-relaxed">
@@ -121,14 +121,14 @@ export function SeoPreview({
       </div>
 
       {/* 3. Schema.org JSON-LD Output */}
-      <div className="p-4 rounded-[3px] bg-[#071522] text-[#FAF9F6] border border-white/10 font-mono text-xs">
+      <div className="p-4 rounded-[3px] bg-[#315C3C] text-white border border-white/10 font-mono text-xs">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] uppercase tracking-wider text-[#A77C3A] font-semibold">
+          <span className="text-[11px] uppercase tracking-wider text-[#527C50] font-semibold">
             Schema.org JSON-LD (Search Rich Results)
           </span>
           <span className="text-[10px] text-white/50">schema.org/Product</span>
         </div>
-        <pre className="overflow-x-auto text-[11px] text-white/80 p-2 bg-[#0D1D2A] rounded-[2px] leading-relaxed">
+        <pre className="overflow-x-auto text-[11px] text-white/80 p-2 bg-[#315C3C] rounded-[2px] leading-relaxed">
           {JSON.stringify(
             {
               "@context": "https://schema.org/",

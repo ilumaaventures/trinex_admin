@@ -254,32 +254,64 @@ export const CATEGORIES = [
 ];
 
 /**
+ * Resilient Category Matcher
+ */
+export function matchLocalCategory(product, catId) {
+  if (!catId || catId === "all") return true;
+  if (!product) return false;
+  const cKey = String(catId).trim().toLowerCase();
+  const pKey = String(product.categoryKey || "").trim().toLowerCase();
+  if (pKey && (pKey === cKey || pKey.replace(/s$/, "") === cKey.replace(/s$/, ""))) return true;
+  const pCat = String(product.category || "").trim().toLowerCase();
+  if (pCat && (pCat === cKey || pCat.replace(/s$/, "") === cKey.replace(/s$/, ""))) return true;
+  const pSlug = String(product.slug || "").toLowerCase();
+  if (pSlug.includes(cKey)) return true;
+  return false;
+}
+
+/**
  * LocalStorage Fallback Helpers
  */
 function getLocalCategories() {
+  let categories = [];
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_CATEGORIES_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        categories = parsed;
+      }
     }
   } catch (err) {
     console.warn("LocalStorage categories read failed:", err);
   }
 
-  const seeded = CATEGORIES.map((c) => ({
-    id: c.id,
-    name: c.name,
-    subtitle: c.subtitle || "",
-    image: c.image || "/assets/products/transformers_chokes.jpg",
-    isHidden: false,
-  }));
-  try {
-    localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(seeded));
-  } catch {
-    // Ignore
+  if (categories.length === 0) {
+    categories = CATEGORIES.map((c) => ({
+      id: c.id,
+      name: c.name,
+      subtitle: c.subtitle || "",
+      image: c.image || "/assets/products/transformers_chokes.jpg",
+      isHidden: false,
+    }));
   }
-  return seeded;
+
+  // Always compute real counts from local inventory so counts are never undefined
+  try {
+    const prods = getLocalProducts();
+    categories = categories.map((c) => {
+      const catId = c.id || c._id;
+      const count = prods.filter((p) => matchLocalCategory(p, catId)).length;
+      return {
+        ...c,
+        count,
+      };
+    });
+  } catch (err) {
+    console.warn("Failed to compute category counts:", err);
+  }
+
+  return categories;
 }
 
 function setLocalCategories(categories) {
@@ -505,8 +537,15 @@ export const api = {
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          setLocalCategories(json.data);
-          return json.data;
+          const prods = getLocalProducts();
+          const categoriesWithCounts = json.data.map((c) => {
+            if (c.count !== undefined) return c;
+            const catId = c.id || c._id;
+            const count = prods.filter((p) => matchLocalCategory(p, catId)).length;
+            return { ...c, count };
+          });
+          setLocalCategories(categoriesWithCounts);
+          return categoriesWithCounts;
         }
       }
     } catch (err) {

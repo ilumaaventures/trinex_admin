@@ -244,18 +244,18 @@ export function ProductEditorModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#FAF9F6] border border-[#132333]/20 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
+      <div className="bg-white border border-[#E5EAE4] w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] shadow-2xl overflow-hidden my-auto">
         {/* Header */}
-        <div className="bg-[#071522] text-white px-6 py-4 flex items-center justify-between border-b border-white/10 flex-shrink-0">
+        <div className="bg-[#315C3C] text-white px-6 py-4 flex items-center justify-between border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[2px] bg-[#A77C3A]/20 border border-[#A77C3A]/40 flex items-center justify-center text-[#A77C3A]">
+            <div className="w-8 h-8 rounded-[2px] bg-[#527C50]/20 border border-[#527C50] flex items-center justify-center text-[#527C50]">
               <TechnicalIcon name="cpu" className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold tracking-wide uppercase">
+              <h2 className="text-base font-heading font-extrabold tracking-wide uppercase">
                 {product?.id ? "Edit Product & SEO Metadata" : "Add New Product with SEO Suite"}
               </h2>
-              <p className="text-[11px] text-white/50 font-mono">
+              <p className="text-[11px] text-white/70 font-sans">
                 SUBDOMAIN ENGINE &bull; admin.trinexsystems.com
               </p>
             </div>
@@ -270,14 +270,14 @@ export function ProductEditorModal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white border-b border-[#132333]/10 px-6 flex items-center gap-1 sm:gap-4 overflow-x-auto flex-shrink-0">
+        <div className="bg-white border-b border-[#E5EAE4] px-6 flex items-center gap-1 sm:gap-4 overflow-x-auto flex-shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab("basic")}
             className={`py-3 px-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
               activeTab === "basic"
-                ? "border-[#A77C3A] text-[#071522]"
-                : "border-transparent text-[#68717A] hover:text-[#071522]"
+                ? "border-[#527C50] text-[#202B25]"
+                : "border-transparent text-[#68736B] hover:text-[#202B25]"
             }`}
           >
             <TechnicalIcon name="layers" className="w-3.5 h-3.5" />
@@ -292,8 +292,8 @@ export function ProductEditorModal({
             onClick={() => setActiveTab("image")}
             className={`py-3 px-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
               activeTab === "image"
-                ? "border-[#A77C3A] text-[#071522]"
-                : "border-transparent text-[#68717A] hover:text-[#071522]"
+                ? "border-[#527C50] text-[#202B25]"
+                : "border-transparent text-[#68736B] hover:text-[#202B25]"
             }`}
           >
             <TechnicalIcon name="box" className="w-3.5 h-3.5" />
@@ -305,13 +305,13 @@ export function ProductEditorModal({
             onClick={() => setActiveTab("seo")}
             className={`py-3 px-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
               activeTab === "seo"
-                ? "border-[#A77C3A] text-[#071522]"
-                : "border-transparent text-[#68717A] hover:text-[#071522]"
+                ? "border-[#527C50] text-[#202B25]"
+                : "border-transparent text-[#68736B] hover:text-[#202B25]"
             }`}
           >
             <TechnicalIcon name="search" className="w-3.5 h-3.5" />
             <span>3. SEO &amp; Meta Suite</span>
-            <span className="text-[10px] px-1.5 py-0.2 bg-[#A77C3A]/20 text-[#A77C3A] rounded font-mono">
+            <span className="text-[10px] px-1.5 py-0.2 bg-[#527C50]/20 text-[#527C50] rounded font-sans font-semibold">
               REQUIRED
             </span>
           </button>
@@ -324,7 +324,7 @@ export function ProductEditorModal({
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Part Number / SKU <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -333,12 +333,12 @@ export function ProductEditorModal({
                     value={formData.partNumber}
                     onChange={handleChange}
                     placeholder="e.g. TPP-95-40-400 or 2N2222A"
-                    className={`w-full px-3.5 py-2.5 text-xs font-mono bg-white border ${
-                      errors.partNumber ? "border-red-500" : "border-[#132333]/20"
-                    } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]`}
+                    className={`w-full px-3.5 py-2.5 text-xs font-sans bg-white border ${
+                      errors.partNumber ? "border-red-500" : "border-[#E5EAE4]"
+                    } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]`}
                   />
                   {errors.partNumber && (
-                    <p className="text-[11px] text-red-500 mt-1 font-mono">
+                    <p className="text-[11px] text-red-500 mt-1 font-sans">
                       {errors.partNumber}
                     </p>
                   )}
@@ -346,14 +346,14 @@ export function ProductEditorModal({
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#071522]">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25]">
                       Product Category <span className="text-red-500">*</span>
                     </label>
                     {onOpenCreateCategory && (
                       <button
                         type="button"
                         onClick={onOpenCreateCategory}
-                        className="text-[11px] font-mono text-[#A77C3A] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-sans text-[#527C50] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <TechnicalIcon name="plus" className="w-3 h-3" />
                         <span>Create Category</span>
@@ -365,8 +365,8 @@ export function ProductEditorModal({
                     value={formData.categoryKey}
                     onChange={handleCategoryChange}
                     className={`w-full px-3.5 py-2.5 text-xs bg-white border ${
-                      errors.categoryKey ? "border-red-500" : "border-[#132333]/20"
-                    } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]`}
+                      errors.categoryKey ? "border-red-500" : "border-[#E5EAE4]"
+                    } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]`}
                   >
                     <option value="">-- Select Category (Mandatory) --</option>
                     {categoryList.map((c) => (
@@ -384,7 +384,7 @@ export function ProductEditorModal({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                   Technical Specification / Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -394,8 +394,8 @@ export function ProductEditorModal({
                   onChange={handleChange}
                   placeholder="Comprehensive technical details, tolerance, voltage, pin configuration, aerospace specs..."
                   className={`w-full px-3.5 py-2.5 text-xs bg-white border ${
-                    errors.description ? "border-red-500" : "border-[#132333]/20"
-                  } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A] leading-relaxed`}
+                    errors.description ? "border-red-500" : "border-[#E5EAE4]"
+                  } rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50] leading-relaxed`}
                 />
                 {errors.description && (
                   <p className="text-[11px] text-red-500 mt-1 font-mono">
@@ -406,7 +406,7 @@ export function ProductEditorModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Stock Quantity
                   </label>
                   <input
@@ -415,12 +415,12 @@ export function ProductEditorModal({
                     min="0"
                     value={formData.stock}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Stock Location
                   </label>
                   <input
@@ -429,12 +429,12 @@ export function ProductEditorModal({
                     value={formData.location}
                     onChange={handleChange}
                     placeholder="e.g. Ready Stock (Delhi)"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Delivery Timeframe
                   </label>
                   <input
@@ -443,12 +443,12 @@ export function ProductEditorModal({
                     value={formData.delivery}
                     onChange={handleChange}
                     placeholder="e.g. Immediate Dispatch"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Mil-Spec Compliance
                   </label>
                   <input
@@ -457,22 +457,22 @@ export function ProductEditorModal({
                     value={formData.compliance}
                     onChange={handleChange}
                     placeholder="e.g. MIL-STD-883"
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
               </div>
 
-              <div className="p-3.5 bg-[#FAF9F6] border border-[#A77C3A]/30 rounded-[2px] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="p-3.5 bg-[#F6F8F5] border border-[#527C50] rounded-[2px] flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <TechnicalIcon name="shield" className="w-4 h-4 text-[#A77C3A]" />
-                  <span className="text-xs text-[#071522] font-semibold">
+                  <TechnicalIcon name="shield" className="w-4 h-4 text-[#527C50]" />
+                  <span className="text-xs text-[#202B25] font-semibold">
                     Quick Action: Auto-generate optimized SEO title, description &amp; tags
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={handleAutoFillSeo}
-                  className="px-3 py-1.5 bg-[#A77C3A] hover:bg-[#C29A58] text-[#071522] text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-[#527C50] hover:bg-[#315C3C] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                 >
                   ⚡ Auto-Populate SEO Fields
                 </button>
@@ -486,18 +486,18 @@ export function ProductEditorModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                       Upload Product Photo
                     </label>
-                    <label className="border-2 border-dashed border-[#132333]/20 hover:border-[#A77C3A] rounded-[3px] p-6 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors group">
+                    <label className="border-2 border-dashed border-[#E5EAE4] hover:border-[#527C50] rounded-[3px] p-6 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors group">
                       <TechnicalIcon
                         name="upload"
-                        className="w-8 h-8 text-[#68717A] group-hover:text-[#A77C3A] transition-colors mb-2"
+                        className="w-8 h-8 text-[#68736B] group-hover:text-[#527C50] transition-colors mb-2"
                       />
-                      <span className="text-xs font-bold text-[#071522]">
+                      <span className="text-xs font-bold text-[#202B25]">
                         {isUploading ? "Uploading to Server..." : "Click or drag image file here"}
                       </span>
-                      <span className="text-[11px] text-[#68717A] mt-1">
+                      <span className="text-[11px] text-[#68736B] mt-1">
                         PNG, JPG, WEBP up to 5MB
                       </span>
                       <input
@@ -511,7 +511,7 @@ export function ProductEditorModal({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                       Or Direct Image URL / Path
                     </label>
                     <input
@@ -520,17 +520,17 @@ export function ProductEditorModal({
                       value={formData.image}
                       onChange={handleChange}
                       placeholder="https://... or /assets/products/..."
-                      className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                      className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Image Live Preview
                   </label>
-                  <div className="border border-[#132333]/15 rounded-[3px] overflow-hidden bg-white shadow-sm p-3">
-                    <div className="h-52 bg-[#071522]/5 rounded-[2px] overflow-hidden flex items-center justify-center">
+                  <div className="border border-[#E5EAE4] rounded-[3px] overflow-hidden bg-white shadow-sm p-3">
+                    <div className="h-52 bg-[#315C3C]/5 rounded-[2px] overflow-hidden flex items-center justify-center">
                       {formData.image ? (
                         <img
                           src={formData.image}
@@ -538,7 +538,7 @@ export function ProductEditorModal({
                           className="w-full h-full object-contain"
                         />
                       ) : (
-                        <span className="text-xs text-[#68717A] font-mono">
+                        <span className="text-xs text-[#68736B] font-mono">
                           No Image Attached
                         </span>
                       )}
@@ -548,7 +548,7 @@ export function ProductEditorModal({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-2">
                   Or Pick From High-Precision Pre-Packaged Defence Visuals
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -565,8 +565,8 @@ export function ProductEditorModal({
                       }
                       className={`p-2 rounded-[2px] border text-left transition-all ${
                         formData.image === preset.path
-                          ? "border-[#A77C3A] bg-[#A77C3A]/10"
-                          : "border-[#132333]/10 bg-white hover:border-[#132333]/30"
+                          ? "border-[#527C50] bg-[#527C50]/10"
+                          : "border-[#E5EAE4] bg-white hover:border-[#E5EAE4]"
                       }`}
                     >
                       <img
@@ -574,7 +574,7 @@ export function ProductEditorModal({
                         alt={preset.label}
                         className="w-full h-16 object-cover rounded-[1px] mb-1.5"
                       />
-                      <span className="text-[10.5px] font-medium text-[#071522] block truncate">
+                      <span className="text-[10.5px] font-medium text-[#202B25] block truncate">
                         {preset.label}
                       </span>
                     </button>
@@ -587,19 +587,19 @@ export function ProductEditorModal({
           {/* TAB 3: SEO SUITE */}
           {activeTab === "seo" && (
             <div className="space-y-5">
-              <div className="flex items-center justify-between border-b border-[#132333]/10 pb-3">
+              <div className="flex items-center justify-between border-b border-[#E5EAE4] pb-3">
                 <div>
-                  <h3 className="text-sm font-bold text-[#071522] uppercase">
+                  <h3 className="text-sm font-heading font-bold text-[#202B25] uppercase">
                     Search Engine Optimization (SEO) Metadata
                   </h3>
-                  <p className="text-[11px] text-[#68717A]">
+                  <p className="text-[11px] text-[#68736B]">
                     Target keywords, SERP meta tags, and OpenGraph social previews.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleAutoFillSeo}
-                  className="px-3 py-1.5 bg-[#071522] hover:bg-[#0D1D2A] text-[#A77C3A] text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-[#315C3C] hover:bg-[#315C3C] text-[#527C50] text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                 >
                   ⚡ Auto-Generate
                 </button>
@@ -607,14 +607,14 @@ export function ProductEditorModal({
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#071522]">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#202B25]">
                     SEO Meta Title (Title Tag)
                   </label>
                   <span
                     className={`text-[11px] font-mono ${
                       formData.metaTitle.length > 60
                         ? "text-amber-600 font-bold"
-                        : "text-[#68717A]"
+                        : "text-[#68736B]"
                     }`}
                   >
                     {formData.metaTitle.length}/60 chars (Recommended 50–60)
@@ -626,20 +626,20 @@ export function ProductEditorModal({
                   value={formData.metaTitle}
                   onChange={handleChange}
                   placeholder="e.g. TPP-95-40-400 Precision Aerospace Transformer | Trinex Systems"
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#071522]">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#202B25]">
                     SEO Meta Description
                   </label>
                   <span
                     className={`text-[11px] font-mono ${
                       formData.metaDescription.length > 160
                         ? "text-amber-600 font-bold"
-                        : "text-[#68717A]"
+                        : "text-[#68736B]"
                     }`}
                   >
                     {formData.metaDescription.length}/160 chars (Recommended 140–160)
@@ -651,17 +651,17 @@ export function ProductEditorModal({
                   value={formData.metaDescription}
                   onChange={handleChange}
                   placeholder="e.g. Sourcing high-frequency 400Hz pulse coupling transformers with immediate dispatch from Trinex Systems LLP, Delhi..."
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A] leading-relaxed"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50] leading-relaxed"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     URL Slug (Permalinks)
                   </label>
                   <div className="flex">
-                    <span className="inline-flex items-center px-2.5 bg-gray-100 border border-r-0 border-[#132333]/20 text-[11px] text-gray-500 font-mono rounded-l-[2px]">
+                    <span className="inline-flex items-center px-2.5 bg-gray-100 border border-r-0 border-[#E5EAE4] text-[11px] text-gray-500 font-mono rounded-l-[2px]">
                       /products/
                     </span>
                     <input
@@ -670,20 +670,20 @@ export function ProductEditorModal({
                       value={formData.slug}
                       onChange={handleChange}
                       placeholder="tpp-95-aerospace-transformer"
-                      className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#132333]/20 rounded-r-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                      className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-r-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Robots Indexing Directive
                   </label>
                   <select
                     name="robots"
                     value={formData.robots}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   >
                     <option value="index, follow">index, follow (Default: Recommended)</option>
                     <option value="noindex, follow">noindex, follow (Hide from search)</option>
@@ -694,7 +694,7 @@ export function ProductEditorModal({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                   Meta Keywords (Comma separated)
                 </label>
                 <input
@@ -703,13 +703,13 @@ export function ProductEditorModal({
                   value={formData.metaKeywords}
                   onChange={handleChange}
                   placeholder="mil-spec, transformers, 400Hz, aerospace, defence parts"
-                  className="w-full px-3 py-2 text-xs bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                  className="w-full px-3 py-2 text-xs bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#132333]/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#E5EAE4]">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Canonical URL Tag
                   </label>
                   <input
@@ -718,12 +718,12 @@ export function ProductEditorModal({
                     value={formData.canonicalUrl}
                     onChange={handleChange}
                     placeholder="https://trinexsystems.com/products/..."
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#071522] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#202B25] mb-1.5">
                     Open Graph (og:image) URL
                   </label>
                   <input
@@ -732,7 +732,7 @@ export function ProductEditorModal({
                     value={formData.ogImage}
                     onChange={handleChange}
                     placeholder="Defaults to Product Image"
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#132333]/20 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#A77C3A]"
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>
               </div>
@@ -740,9 +740,9 @@ export function ProductEditorModal({
           )}
 
           {/* Modal Footer */}
-          <div className="pt-4 border-t border-[#132333]/10 flex items-center justify-between gap-3">
-            <div className="text-xs text-[#68717A] font-mono">
-              Status: <span className="text-[#A77C3A] font-bold">READY TO PUBLISH</span>
+          <div className="pt-4 border-t border-[#E5EAE4] flex items-center justify-between gap-3">
+            <div className="text-xs text-[#68736B] font-sans font-medium">
+              Status: <span className="text-[#527C50] font-bold">READY TO PUBLISH</span>
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={onClose}>
