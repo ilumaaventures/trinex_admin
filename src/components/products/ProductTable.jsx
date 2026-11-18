@@ -44,17 +44,12 @@ export function ProductTable({ products, categories = [], onEdit, onDelete, onTo
               <th className="py-3 px-4">Website Visibility</th>
               <th className="py-3 px-4">Technical Details</th>
               <th className="py-3 px-4">Stock &amp; Location</th>
-              <th className="py-3 px-4">SEO Health</th>
               <th className="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E2EAE0] text-xs">
             {products.map((product) => {
               const productId = product.id || product._id;
-              const hasFullSeo =
-                Boolean(product.metaTitle) &&
-                Boolean(product.metaDescription) &&
-                Boolean(product.slug);
 
               const pKey = String(product.categoryKey || "").toLowerCase();
               const pCat = String(product.category || "").toLowerCase();
@@ -140,21 +135,6 @@ export function ProductTable({ products, categories = [], onEdit, onDelete, onTo
                     <div className="text-[11px] text-[#6F966B] font-semibold">
                       {product.location}
                     </div>
-                  </td>
-
-                  {/* SEO Badge */}
-                  <td className="py-3.5 px-4 whitespace-nowrap">
-                    {hasFullSeo ? (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-sans font-medium rounded-[2px]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        OPTIMIZED
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-sans font-medium rounded-[2px]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                        AUTO DEFAULT
-                      </span>
-                    )}
                   </td>
 
                   {/* Actions */}
