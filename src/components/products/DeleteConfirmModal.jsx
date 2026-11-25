@@ -60,7 +60,7 @@ export function DeleteConfirmModal({ isOpen, product, onConfirm, onCancel }) {
           <Button variant="outline" onClick={onCancel}>
             CANCEL
           </Button>
-          <Button variant="danger" onClick={() => onConfirm(product.id)}>
+          <Button variant="danger" onClick={() => onConfirm(product.id || product._id)}>
             <TechnicalIcon name="trash" className="w-4 h-4 mr-1.5" />
             CONFIRM DELETE
           </Button>

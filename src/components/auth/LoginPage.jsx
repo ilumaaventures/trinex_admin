@@ -170,7 +170,7 @@ export function LoginPage({ onLoginSuccess }) {
                 <span>Remember me</span>
               </label>
               <span className="text-[11px] font-sans font-medium text-[#869288]">
-                Session: 30 days
+                {rememberMe ? "Session: 30 days" : "Session: Browser tab"}
               </span>
             </div>
 

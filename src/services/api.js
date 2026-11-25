@@ -123,7 +123,10 @@ export const api = {
         headers: getAuthHeaders({ "Cache-Control": "no-cache" }),
       });
       clearTimeout(timeoutId);
-      if (res.ok) {
+      if (res.status === 401) {
+        clearAuthSession();
+        window.dispatchEvent(new Event("auth-changed"));
+      } else if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           const list = json.data;
@@ -232,7 +235,10 @@ export const api = {
         headers: getAuthHeaders({ "Cache-Control": "no-cache" }),
       });
       clearTimeout(timeoutId);
-      if (res.ok) {
+      if (res.status === 401) {
+        clearAuthSession();
+        window.dispatchEvent(new Event("auth-changed"));
+      } else if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           return json.data;
@@ -339,7 +345,7 @@ export const api = {
 
   async login({ emailOrUsername, password, rememberMe = true }) {
     const normId = String(emailOrUsername || "").trim();
-    const normPw = String(password || "").trim();
+    const normPw = String(password || "");
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);

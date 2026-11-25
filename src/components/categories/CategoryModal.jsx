@@ -494,7 +494,7 @@ export function CategoryModal({
                   const catIsHidden = Boolean(cat.isHidden);
                   return (
                     <div
-                      key={cat.id}
+                      key={cat.id || cat._id}
                       className={`p-3 border rounded-[3px] flex items-start justify-between gap-3 shadow-2xs transition-colors ${
                         catIsHidden ? "bg-amber-50/50 border-amber-300" : "bg-white border-[#E5EAE4]"
                       }`}
