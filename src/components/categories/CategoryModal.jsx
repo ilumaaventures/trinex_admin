@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 import { Button } from "../ui/Button";
 import { api } from "../../services/api";
@@ -22,44 +22,20 @@ export function CategoryModal({
   onCategoryCreated,
   onCategoryUpdated,
   onCategoryDeleted,
-  onCategoryToggled,
   onClose,
 }) {
   const isEditMode = Boolean(categoryToEdit);
 
-  const [name, setName] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState("/assets/products/transformers_chokes.jpg");
-  const [customSlug, setCustomSlug] = useState("");
-  const [isHidden, setIsHidden] = useState(false);
+  const [name, setName] = useState(categoryToEdit?.name || "");
+  const [subtitle, setSubtitle] = useState(categoryToEdit?.subtitle || "");
+  const [description, setDescription] = useState(categoryToEdit?.description || "");
+  const [image, setImage] = useState(categoryToEdit?.image || "/assets/products/transformers_chokes.jpg");
+  const [customSlug, setCustomSlug] = useState(categoryToEdit?.id || "");
+  const [isHidden, setIsHidden] = useState(Boolean(categoryToEdit?.isHidden));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
-
-  // Sync state whenever modal opens or categoryToEdit changes
-  useEffect(() => {
-    if (!isOpen) return;
-
-    if (categoryToEdit) {
-      setName(categoryToEdit.name || "");
-      setSubtitle(categoryToEdit.subtitle || "");
-      setDescription(categoryToEdit.description || "");
-      setImage(categoryToEdit.image || "/assets/products/transformers_chokes.jpg");
-      setCustomSlug(categoryToEdit.id || "");
-      setIsHidden(Boolean(categoryToEdit.isHidden));
-      setError("");
-    } else {
-      setName("");
-      setSubtitle("");
-      setDescription("");
-      setImage("/assets/products/transformers_chokes.jpg");
-      setCustomSlug("");
-      setIsHidden(false);
-      setError("");
-    }
-  }, [isOpen, categoryToEdit]);
 
   if (!isOpen) return null;
 

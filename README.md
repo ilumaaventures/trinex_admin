@@ -1,21 +1,21 @@
-# Trinex Systems &mdash; Dedicated Admin Frontend Portal
+﻿# Trinex Systems &mdash; Dedicated Admin Frontend Portal
 
-A standalone React 19 + Vite frontend application designed specifically to run on the **`admin.trinexsystems.com`** subdomain. Completely decoupled from the client-facing corporate website (`trinex_fe`).
+A standalone React 19 + Vite frontend application designed specifically to run on the **`admin.trinexsystems.in`** subdomain. Completely decoupled from the client-facing corporate website (`trinex_fe`).
 
 ---
 
-## 🏛️ Ecosystem Overview
+## ðŸ›ï¸ Ecosystem Overview
 
 ```
 trinix/
-├── trinex_fe/         # Client-facing portal (trinexsystems.com) ──▶ Port 5173
-├── trinex_admin_fe/   # Standalone Admin Portal (admin.trinexsystems.com) ──▶ Port 5174
-└── trinex_admin/      # Node.js/Express Backend & Database ──▶ Port 5000
+â”œâ”€â”€ trinex_fe/         # Client-facing portal (trinexsystems.in) â”€â”€â–¶ Port 5173
+â”œâ”€â”€ trinex_admin_fe/   # Standalone Admin Portal (admin.trinexsystems.in) â”€â”€â–¶ Port 5174
+â””â”€â”€ trinex_admin/      # Node.js/Express Backend & Database â”€â”€â–¶ Port 5000
 ```
 
 ---
 
-## 🚀 Quick Start
+## ðŸš€ Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -34,7 +34,7 @@ The admin portal will start immediately on **Port 5174**:
 
 ---
 
-## 🛠️ Features Included
+## ðŸ› ï¸ Features Included
 
 1. **Complete Product CRUD:**
    - Create, edit, and delete aerospace and defence components.
@@ -50,8 +50,8 @@ The admin portal will start immediately on **Port 5174**:
    - Live aspect-ratio image preview.
 
 3. **Complete SEO & Social Metadata Suite:**
-   - **Meta Title:** With real-time 50–60 character limit counter.
-   - **Meta Description:** With real-time 140–160 character limit counter.
+   - **Meta Title:** With real-time 50â€“60 character limit counter.
+   - **Meta Description:** With real-time 140â€“160 character limit counter.
    - **Meta Keywords:** Comma-separated search indexing tags.
    - **URL Slug:** Canonical permalink with auto-slugifier.
    - **Canonical URL:** Preventing duplicate content penalties.
@@ -67,19 +67,19 @@ The admin portal will start immediately on **Port 5174**:
 
 ---
 
-## 🌐 Production Subdomain Setup (`admin.trinexsystems.com`)
+## ðŸŒ Production Subdomain Setup (`admin.trinexsystems.in`)
 
 ### DNS Record (Cloudflare / GoDaddy / Route 53):
 - **Type:** `CNAME`
 - **Name:** `admin`
-- **Target:** `trinexsystems.com` (or your server/Vercel IP)
+- **Target:** `trinexsystems.in` (or your server/Vercel IP)
 
 ### Nginx Virtual Host:
 ```nginx
 server {
     listen 80;
     listen 443 ssl http2;
-    server_name admin.trinexsystems.com;
+    server_name admin.trinexsystems.in;
 
     root /var/www/trinix/trinex_admin_fe/dist;
     index index.html;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 import { Button } from "../ui/Button";
 import { CATEGORIES, api } from "../../services/api";
@@ -182,7 +182,7 @@ export function ProductEditorModal({
       metaTitle: `${pn} - ${cat}${complianceSuffix} | Trinex Systems LLP`,
       metaDescription: `${pn} ${cat}${complianceSuffix}. ${desc.slice(0, 100)}. In stock with immediate dispatch from Trinex Systems LLP.`,
       metaKeywords: `${pn}, ${cat}, ${compliance}, defence components, mil-spec, India defence electronics, aerospace parts, Make in India`,
-      canonicalUrl: `https://trinexsystems.com/products/${cleanSlug}`,
+      canonicalUrl: `https://trinexsystems.in/products/${cleanSlug}`,
       ogTitle: `${pn} (${cat}) - Trinex Systems Defence Stock`,
       ogDescription: desc.slice(0, 150),
       ogImage: prev.image,
@@ -226,7 +226,7 @@ export function ProductEditorModal({
         `${pn} ${cat}${complianceSuffix}. ${formData.description.slice(0, 100)}. In stock with immediate dispatch from Trinex Systems LLP.`,
       canonicalUrl:
         formData.canonicalUrl.trim() ||
-        `https://trinexsystems.com/products/${cleanSlug}`,
+        `https://trinexsystems.in/products/${cleanSlug}`,
       ogTitle: formData.ogTitle.trim() || formData.metaTitle.trim() || `${pn} (${cat}) - Trinex Systems`,
       ogDescription:
         formData.ogDescription.trim() ||
@@ -256,7 +256,7 @@ export function ProductEditorModal({
                 {product?.id || product?._id ? "Edit Product & SEO Metadata" : "Add New Product with SEO Suite"}
               </h2>
               <p className="text-[11px] text-white/70 font-sans">
-                SUBDOMAIN ENGINE &bull; admin.trinexsystems.com
+                SUBDOMAIN ENGINE &bull; admin.trinexsystems.in
               </p>
             </div>
           </div>
@@ -474,7 +474,7 @@ export function ProductEditorModal({
                   onClick={handleAutoFillSeo}
                   className="px-3 py-1.5 bg-[#527C50] hover:bg-[#315C3C] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                 >
-                  ⚡ Auto-Populate SEO Fields
+                  âš¡ Auto-Populate SEO Fields
                 </button>
               </div>
             </div>
@@ -601,7 +601,7 @@ export function ProductEditorModal({
                   onClick={handleAutoFillSeo}
                   className="px-3 py-1.5 bg-[#315C3C] hover:bg-[#315C3C] text-[#527C50] text-xs font-mono uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                 >
-                  ⚡ Auto-Generate
+                  âš¡ Auto-Generate
                 </button>
               </div>
 
@@ -617,7 +617,7 @@ export function ProductEditorModal({
                         : "text-[#68736B]"
                     }`}
                   >
-                    {formData.metaTitle.length}/60 chars (Recommended 50–60)
+                    {formData.metaTitle.length}/60 chars (Recommended 50â€“60)
                   </span>
                 </div>
                 <input
@@ -642,7 +642,7 @@ export function ProductEditorModal({
                         : "text-[#68736B]"
                     }`}
                   >
-                    {formData.metaDescription.length}/160 chars (Recommended 140–160)
+                    {formData.metaDescription.length}/160 chars (Recommended 140â€“160)
                   </span>
                 </div>
                 <textarea
@@ -717,7 +717,7 @@ export function ProductEditorModal({
                     name="canonicalUrl"
                     value={formData.canonicalUrl}
                     onChange={handleChange}
-                    placeholder="https://trinexsystems.com/products/..."
+                    placeholder="https://trinexsystems.in/products/..."
                     className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#E5EAE4] rounded-[2px] focus:outline-none focus:ring-1 focus:ring-[#527C50]"
                   />
                 </div>

@@ -1,4 +1,4 @@
-export function SeoPreview({
+﻿export function SeoPreview({
   metaTitle,
   metaDescription,
   slug,
@@ -14,7 +14,7 @@ export function SeoPreview({
     metaTitle || `${partNumber || "Component"} - ${category || "Defence"} | Trinex Systems LLP`;
   const displayUrl =
     canonicalUrl ||
-    `https://trinexsystems.com/products/${slug || "component"}`;
+    `https://trinexsystems.in/products/${slug || "component"}`;
   const displayDesc =
     metaDescription ||
     "Precision defence and aerospace component. Available with immediate dispatch and mil-spec standard compliance from Trinex Systems LLP.";
@@ -42,7 +42,7 @@ export function SeoPreview({
               T
             </span>
             <span className="text-[12px] text-[#202124] truncate">
-              trinexsystems.com &rsaquo; products &rsaquo; {slug || "part"}
+              trinexsystems.in &rsaquo; products &rsaquo; {slug || "part"}
             </span>
           </div>
 
@@ -58,7 +58,7 @@ export function SeoPreview({
                 month: "short",
                 day: "numeric",
                 year: "numeric",
-              })} —{" "}
+              })} â€”{" "}
             </span>
             {displayDesc}
           </p>

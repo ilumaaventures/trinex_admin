@@ -367,7 +367,7 @@ export const api = {
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === "AbortError") {
-        throw new Error("Login request timed out. Please check your network connection.");
+        throw new Error("Login request timed out. Please check your network connection.", { cause: err });
       }
       throw err;
     }

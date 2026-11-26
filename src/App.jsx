@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { api, CATEGORIES } from "./services/api";
 import { AdminHeader } from "./components/layout/AdminHeader";
 import { ProductTable } from "./components/products/ProductTable";
@@ -11,7 +11,7 @@ import { TechnicalIcon } from "./components/ui/TechnicalIcon";
 import { Toast } from "./components/ui/Toast";
 
 // Helper for resilient category matching (handles singular/plural and slug differences)
-export function matchCategory(product, catId) {
+function matchCategory(product, catId) {
   if (!catId || catId === "all") return true;
   if (!product) return false;
   const cKey = String(catId).trim().toLowerCase();
@@ -873,13 +873,13 @@ export default function App() {
 
       {/* 4B. Category Manager & Creation/Edit Modal */}
       <CategoryModal
+        key={isCategoryModalOpen ? (editingCategory?.id || editingCategory?._id || "new") : "closed"}
         isOpen={isCategoryModalOpen}
         categoryToEdit={editingCategory}
         categories={categories}
         onCategoryCreated={handleCategoryCreated}
         onCategoryUpdated={handleCategoryUpdated}
         onCategoryDeleted={handleCategoryDeleted}
-        onCategoryToggled={handleToggleCategoryVisibility}
         onClose={() => {
           setIsCategoryModalOpen(false);
           setEditingCategory(null);

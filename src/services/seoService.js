@@ -1,4 +1,4 @@
-export function slugify(text) {
+﻿export function slugify(text) {
   return String(text || "")
     .toLowerCase()
     .trim()
@@ -26,7 +26,7 @@ export function buildDefaultSeo(product) {
     slug: cleanSlug,
     canonicalUrl:
       product.canonicalUrl?.trim() ||
-      `https://trinexsystems.com/products/${cleanSlug}`,
+      `https://trinexsystems.in/products/${cleanSlug}`,
     robots: product.robots || "index, follow",
     ogTitle: product.ogTitle?.trim() || product.metaTitle?.trim() || `${pn} (${cat}) - Trinex Systems`,
     ogDescription:
