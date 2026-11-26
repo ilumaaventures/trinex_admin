@@ -1,12 +1,21 @@
 import { buildDefaultSeo } from "./seoService";
 
-const rawApiUrl = (import.meta.env?.VITE_API_URL || "").trim().replace(/\/+$/, "");
+/**
+ * Environment-Driven API Configuration
+ * Resolves the backend API base URL from Vite environment variables (VITE_API_URL).
+ * Never hardcodes any remote backend URLs, credentials, or mock datasets.
+ */
+const rawApiUrl = (
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) ||
+  ""
+).trim().replace(/\/+$/, "");
+
 export const API_BASE = rawApiUrl
   ? rawApiUrl.endsWith("/api")
     ? rawApiUrl
     : `${rawApiUrl}/api`
-  : (import.meta.env?.DEV ? "/api" : "https://trinex-be.onrender.com/api");
-const LOCAL_STORAGE_KEY = "trinex_inventory_products_v1";
+  : "/api";
+
 const AUTH_TOKEN_KEY = "trinex_admin_token";
 const AUTH_USER_KEY = "trinex_admin_user";
 
@@ -62,7 +71,7 @@ export function clearAuthSession() {
   }
 }
 
-function getAuthHeaders(extra = {}) {
+export function getAuthHeaders(extra = {}) {
   const token = getAuthToken();
   const headers = { ...extra };
   if (token) {
@@ -71,190 +80,13 @@ function getAuthHeaders(extra = {}) {
   return headers;
 }
 
-const INITIAL_SEED_PRODUCTS = [
-  {
-    id: 1,
-    partNumber: "TPP--95-40-400",
-    category: "TRANSFORMER",
-    categoryKey: "transformers",
-    image: "/assets/products/transformers_chokes.jpg",
-    description: "Precision aerospace transformer, high-frequency 400Hz pulse coupling module",
-    stock: 2,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-STD-883 / ISO 9001",
-  },
-  {
-    id: 2,
-    partNumber: "TPP-21-40-400",
-    category: "TRANSFORMER",
-    categoryKey: "transformers",
-    image: "/assets/products/transformers_chokes.jpg",
-    description: "Compact military pulse transformer for aerospace electronic subsystems",
-    stock: 2,
-    location: "Central Stock",
-    delivery: "4–7 Days Delivery",
-    compliance: "MIL-STD-883",
-  },
-  {
-    id: 3,
-    partNumber: "249KP1",
-    category: "MICRO CIRCUIT",
-    categoryKey: "microcircuits",
-    image: "/assets/products/microcircuits.jpg",
-    description: "Hermetic ceramic multi-channel optoelectronic switch / driver IC",
-    stock: 150,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-STD-883 Class B",
-  },
-  {
-    id: 4,
-    partNumber: "530TV9",
-    category: "MICRO CIRCUIT",
-    categoryKey: "microcircuits",
-    image: "/assets/products/microcircuits.jpg",
-    description: "Military-grade ceramic dual JK flip-flop digital logic IC",
-    stock: 35,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-STD-883",
-  },
-  {
-    id: 5,
-    partNumber: "2N2222A",
-    category: "TRANSISTOR",
-    categoryKey: "transistors-diodes",
-    image: "/assets/products/diodes_transistors.jpg",
-    description: "High-reliability NPN switching transistor in hermetic metal TO-18 can",
-    stock: 500,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-PRF-19500",
-  },
-  {
-    id: 6,
-    partNumber: "2N3055",
-    category: "POWER TRANSISTOR",
-    categoryKey: "transistors-diodes",
-    image: "/assets/products/diodes_transistors.jpg",
-    description: "Complementary silicon high-power audio/linear switching transistor in TO-3 can",
-    stock: 120,
-    location: "Central Stock",
-    delivery: "2–4 Days Delivery",
-    compliance: "JANTX Standard",
-  },
-  {
-    id: 7,
-    partNumber: "SMR-100K-0.1%",
-    category: "RESISTOR",
-    categoryKey: "resistors",
-    image: "/assets/products/resistors.jpg",
-    description: "Ultra-precision metal film resistor, 0.1% tolerance, ultra-low temperature coefficient",
-    stock: 850,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-PRF-55342",
-  },
-  {
-    id: 8,
-    partNumber: "CSR13-100UF-50V",
-    category: "CAPACITOR",
-    categoryKey: "capacitors",
-    image: "/assets/products/capacitors.jpg",
-    description: "Hermetically sealed solid tantalum electrolytic capacitor for high-reliability radar circuits",
-    stock: 75,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-PRF-39003",
-  },
-  {
-    id: 9,
-    partNumber: "D38999/20WJ35PN",
-    category: "CONNECTOR",
-    categoryKey: "connectors",
-    image: "/assets/products/connectors.jpg",
-    description: "Series III circular receptacle connector, 128-pin gold plated contacts, olive drab cadmium",
-    stock: 14,
-    location: "Ready Stock (Delhi)",
-    delivery: "Immediate Dispatch",
-    compliance: "MIL-DTL-38999",
-  },
-  {
-    id: 10,
-    partNumber: "D38999/26WJ61SN",
-    category: "CONNECTOR",
-    categoryKey: "connectors",
-    image: "/assets/products/connectors.jpg",
-    description: "Hermetic high-density circular plug with EMI ground spring, 61 socket pins",
-    stock: 8,
-    location: "Central Stock",
-    delivery: "3–5 Days Delivery",
-    compliance: "MIL-DTL-38999 Series III",
-  },
-];
-
-const LOCAL_STORAGE_CATEGORIES_KEY = "trinex_inventory_categories_v1";
-
-export const CATEGORIES = [
-  {
-    id: "transformers",
-    name: "TRANSFORMER",
-    subtitle: "Transformers, Power Units & Chokes",
-    image: "/assets/products/transformers_chokes.jpg",
-  },
-  {
-    id: "resistors",
-    name: "RESISTOR",
-    subtitle: "Precision & Power Resistors",
-    image: "/assets/products/resistors.jpg",
-  },
-  {
-    id: "capacitors",
-    name: "CAPACITOR",
-    subtitle: "Tantalum, Ceramic & Film",
-    image: "/assets/products/capacitors.jpg",
-  },
-  {
-    id: "microcircuits",
-    name: "MICRO CIRCUIT",
-    subtitle: "Logic & Digital ICs",
-    image: "/assets/products/microcircuits.jpg",
-  },
-  {
-    id: "transistors-diodes",
-    name: "DIODES & TRANSISTORS",
-    subtitle: "Power Transistors & Zener Diodes",
-    image: "/assets/products/diodes_transistors.jpg",
-  },
-  {
-    id: "connectors",
-    name: "CONNECTOR",
-    subtitle: "Mil-Spec Multi-Pin Connectors",
-    image: "/assets/products/connectors.jpg",
-  },
-  {
-    id: "motors",
-    name: "MOTORS & GENERATORS",
-    subtitle: "Precision Servo Motors",
-    image: "/assets/products/motors_generators.jpg",
-  },
-  {
-    id: "switches-fuses",
-    name: "SWITCHES & FUSES",
-    subtitle: "Switches, Fuses & Indicators",
-    image: "/assets/products/switches_fuses.jpg",
-  },
-  {
-    id: "demo",
-    name: "DEMO",
-    subtitle: "Demonstration Components",
-    image: "https://res.cloudinary.com/dtzxn6wrm/image/upload/v1793192093/trinix/file_jntkgs.png",
-  },
-];
+/**
+ * Initial empty categories list (pure backend driven)
+ */
+export const CATEGORIES = [];
 
 /**
- * Resilient Category Matcher
+ * Resilient Category Matcher utility
  */
 export function matchLocalCategory(product, catId) {
   if (!catId || catId === "all") return true;
@@ -270,107 +102,10 @@ export function matchLocalCategory(product, catId) {
 }
 
 /**
- * LocalStorage Fallback Helpers
- */
-function getLocalCategories() {
-  let categories = [];
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_CATEGORIES_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        categories = parsed;
-      }
-    }
-  } catch (err) {
-    console.warn("LocalStorage categories read failed:", err);
-  }
-
-  if (categories.length === 0) {
-    categories = CATEGORIES.map((c) => ({
-      id: c.id,
-      name: c.name,
-      subtitle: c.subtitle || "",
-      image: c.image || "/assets/products/transformers_chokes.jpg",
-      isHidden: false,
-    }));
-  }
-
-  // Always compute real counts from local inventory so counts are never undefined
-  try {
-    const prods = getLocalProducts();
-    categories = categories.map((c) => {
-      const catId = c.id || c._id;
-      const count = prods.filter((p) => matchLocalCategory(p, catId)).length;
-      return {
-        ...c,
-        count,
-      };
-    });
-  } catch (err) {
-    console.warn("Failed to compute category counts:", err);
-  }
-
-  return categories;
-}
-
-function setLocalCategories(categories) {
-  try {
-    if (Array.isArray(categories) && categories.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(categories));
-      window.dispatchEvent(new Event("categories-updated"));
-      window.dispatchEvent(new Event("storage"));
-    }
-  } catch (err) {
-    console.warn("LocalStorage categories write failed:", err);
-  }
-}
-
-/**
- * LocalStorage Fallback Helper
- */
-function getLocalProducts() {
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((item) => ({
-          ...buildDefaultSeo(item),
-          ...item,
-        }));
-      }
-    }
-  } catch (err) {
-    console.warn("LocalStorage read failed:", err);
-  }
-
-  const seeded = INITIAL_SEED_PRODUCTS.map((item) => ({
-    ...buildDefaultSeo(item),
-    ...item,
-  }));
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(seeded));
-  } catch {
-    // Ignore
-  }
-  return seeded;
-}
-
-function setLocalProducts(products) {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(products));
-    window.dispatchEvent(new Event("storage"));
-  } catch (err) {
-    console.warn("LocalStorage write failed:", err);
-  }
-}
-
-/**
- * API Service with dual-mode (backend API + localStorage fallback)
+ * Live API Service connected to the configured Backend
  */
 export const api = {
-  // 1. Fetch Products (Supports query parameters including pagination, search, category, location)
+  // 1. Fetch Products
   async getProducts(queryParams = {}) {
     const cleanParams = new URLSearchParams();
     Object.entries(queryParams).forEach(([key, val]) => {
@@ -382,29 +117,45 @@ export const api = {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(`${API_BASE}/products?${cleanParams.toString()}`, {
         signal: controller.signal,
-        headers: { "Cache-Control": "no-cache" },
+        headers: getAuthHeaders({ "Cache-Control": "no-cache" }),
       });
       clearTimeout(timeoutId);
-      if (res.ok) {
+      if (res.status === 401) {
+        clearAuthSession();
+        window.dispatchEvent(new Event("auth-changed"));
+      } else if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           const list = json.data;
           list.pagination = json.pagination || null;
-          if (!queryParams.page || (Number(queryParams.page) === 1 && !queryParams.search && (!queryParams.category || queryParams.category === "all"))) {
-            setLocalProducts(list);
-          }
           return list;
         }
       }
     } catch (err) {
-      console.warn("[API] getProducts error:", err.message);
+      console.warn("[API] getProducts network error:", err.message);
     }
-    const local = getLocalProducts();
-    local.pagination = null;
-    return local;
+    const emptyList = [];
+    emptyList.pagination = null;
+    return emptyList;
+  },
+
+  // 1B. Fetch Single Product
+  async getProductById(id) {
+    try {
+      const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}`, {
+        headers: getAuthHeaders({ "Cache-Control": "no-cache" }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) return json.data;
+      }
+    } catch (err) {
+      console.warn("[API] getProductById error:", err.message);
+    }
+    return null;
   },
 
   // 2. Create Product
@@ -412,29 +163,18 @@ export const api = {
     const seoDecorated = {
       ...buildDefaultSeo(productData),
       ...productData,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
-    try {
-      const res = await fetch(`${API_BASE}/products`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(seoDecorated),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return json.data;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/products`, {
+      method: "POST",
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(seoDecorated),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to create product");
     }
-
-    const current = getLocalProducts();
-    const updated = [seoDecorated, ...current];
-    setLocalProducts(updated);
-    return seoDecorated;
+    return json.data;
   },
 
   // 3. Update Product
@@ -442,116 +182,72 @@ export const api = {
     const seoDecorated = {
       ...buildDefaultSeo(productData),
       ...productData,
-      id,
-      updatedAt: new Date().toISOString(),
     };
 
-    try {
-      const res = await fetch(`${API_BASE}/products/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(seoDecorated),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return json.data;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(seoDecorated),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to update product");
     }
-
-    const current = getLocalProducts();
-    const updated = current.map((p) => (String(p.id) === String(id) ? { ...p, ...seoDecorated } : p));
-    setLocalProducts(updated);
-    return seoDecorated;
+    return json.data;
   },
 
   // 4. Delete Product
   async deleteProduct(id) {
-    try {
-      const res = await fetch(`${API_BASE}/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return true;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to delete product");
     }
-
-    const current = getLocalProducts();
-    const updated = current.filter((p) => String(p.id) !== String(id));
-    setLocalProducts(updated);
     return true;
   },
 
-  // 4B. Toggle Product Visibility (Hide / Unhide from main website)
+  // 4B. Toggle Product Visibility
   async toggleProductVisibility(id) {
-    try {
-      const res = await fetch(`${API_BASE}/products/${id}/visibility`, {
-        method: "PATCH",
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          try {
-            const current = getLocalProducts();
-            const updated = current.map((p) =>
-              String(p.id) === String(id) || String(p._id) === String(id)
-                ? { ...p, isHidden: json.data.isHidden }
-                : p
-            );
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-          } catch {}
-          return json.data;
-        }
-      }
-    } catch {
-      // Fallback
+    if (!id || id === "undefined" || id === "null") {
+      throw new Error("Valid Product ID is required");
     }
-
-    const current = getLocalProducts();
-    let updatedProduct = null;
-    const updated = current.map((p) => {
-      if (String(p.id) === String(id) || String(p._id) === String(id)) {
-        updatedProduct = { ...p, isHidden: !p.isHidden };
-        return updatedProduct;
-      }
-      return p;
+    const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}/visibility`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
     });
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
-    return updatedProduct;
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to toggle product visibility");
+    }
+    return json.data;
   },
 
   // 4C. Get Categories
   async getCategories() {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(`${API_BASE}/categories?_t=${Date.now()}`, {
         signal: controller.signal,
-        headers: { "Cache-Control": "no-cache" },
+        headers: getAuthHeaders({ "Cache-Control": "no-cache" }),
       });
       clearTimeout(timeoutId);
-      if (res.ok) {
+      if (res.status === 401) {
+        clearAuthSession();
+        window.dispatchEvent(new Event("auth-changed"));
+      } else if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          const prods = getLocalProducts();
-          const categoriesWithCounts = json.data.map((c) => {
-            if (c.count !== undefined) return c;
-            const catId = c.id || c._id;
-            const count = prods.filter((p) => matchLocalCategory(p, catId)).length;
-            return { ...c, count };
-          });
-          setLocalCategories(categoriesWithCounts);
-          return categoriesWithCounts;
+        if (json.success && Array.isArray(json.data)) {
+          return json.data;
         }
       }
     } catch (err) {
-      console.warn("Failed to fetch live categories, falling back to local cache:", err.message);
+      console.warn("[API] getCategories network error:", err.message);
     }
-    return getLocalCategories();
+    return [];
   },
 
   // 4D. Toggle Category Visibility
@@ -559,144 +255,85 @@ export const api = {
     if (!id || id === "undefined" || id === "null") {
       throw new Error("Invalid Category ID");
     }
-    try {
-      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}/visibility`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          try {
-            const current = getLocalCategories();
-            const updated = current.map((c) =>
-              String(c.id || c._id) === String(id) ? { ...c, isHidden: json.data.isHidden } : c
-            );
-            localStorage.setItem(LOCAL_STORAGE_CATEGORIES_KEY, JSON.stringify(updated));
-          } catch {}
-          return json.data;
-        }
-      }
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.message || `Server returned ${res.status}`);
-    } catch (err) {
-      console.error("Toggle category visibility error:", err);
-      throw err;
+    const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}/visibility`, {
+      method: "PATCH",
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to toggle category visibility");
     }
+    return json.data;
   },
 
   // 4E. Create Category
   async createCategory(categoryData) {
-    try {
-      const res = await fetch(`${API_BASE}/categories`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryData),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to create category");
-      }
-      const current = getLocalCategories();
-      const updated = [...current, json.data];
-      setLocalCategories(updated);
-      return json.data;
-    } catch (err) {
-      console.error("Create category error:", err);
-      throw err;
+    const res = await fetch(`${API_BASE}/categories`, {
+      method: "POST",
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(categoryData),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to create category");
     }
+    return json.data;
   },
 
   // 4F. Update Category
   async updateCategory(id, categoryData) {
-    try {
-      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryData),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to update category");
-      }
-      const current = getLocalCategories();
-      const updated = current.map((c) =>
-        String(c.id || c._id) === String(id) ? { ...c, ...json.data } : c
-      );
-      setLocalCategories(updated);
-      return json.data;
-    } catch (err) {
-      console.error("Update category error:", err);
-      throw err;
+    const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(categoryData),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to update category");
     }
+    return json.data;
   },
 
   // 4G. Delete Category
   async deleteCategory(id) {
-    try {
-      const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
-        method: "DELETE",
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to delete category");
-      }
-      const current = getLocalCategories();
-      const updated = current.filter((c) => String(c.id || c._id) !== String(id));
-      setLocalCategories(updated);
-      return true;
-    } catch (err) {
-      console.error("Delete category error:", err);
-      throw err;
+    const res = await fetch(`${API_BASE}/categories/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to delete category");
     }
+    return true;
   },
 
   // 5. Upload Image
   async uploadImage(file) {
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-      const res = await fetch(`${API_BASE}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) return json.imageUrl;
-      }
-    } catch {
-      // Fallback to Base64
-    }
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch(`${API_BASE}/upload`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: formData,
     });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success || !json.imageUrl) {
+      throw new Error(json.message || "Failed to upload image to server");
+    }
+    return json.imageUrl;
   },
 
   // 6. Reset Catalog
   async resetCatalog() {
-    try {
-      const res = await fetch(`${API_BASE}/products/reset`, { method: "POST" });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success) {
-          setLocalProducts(json.data);
-          return json.data;
-        }
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/products/reset`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Failed to reset catalog");
     }
-
-    const seeded = INITIAL_SEED_PRODUCTS.map((item) => ({
-      ...buildDefaultSeo(item),
-      ...item,
-    }));
-    setLocalProducts(seeded);
-    return seeded;
+    return json.data;
   },
 
   // 7. Authentication Suite
@@ -707,12 +344,12 @@ export const api = {
   },
 
   async login({ emailOrUsername, password, rememberMe = true }) {
-    const normId = String(emailOrUsername || "").trim().toLowerCase();
-    const normPw = String(password || "").trim();
+    const normId = String(emailOrUsername || "").trim();
+    const normPw = String(password || "");
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
       const res = await fetch(`${API_BASE}/auth/login`, {
         signal: controller.signal,
         method: "POST",
@@ -728,35 +365,11 @@ export const api = {
       window.dispatchEvent(new Event("auth-changed"));
       return json;
     } catch (err) {
-      // Bubble up explicit server rejection messages (e.g. 401 Unauthorized)
-      if (err.message && !err.message.includes("fetch") && !err.message.includes("abort")) {
-        throw err;
+      clearTimeout(timeoutId);
+      if (err.name === "AbortError") {
+        throw new Error("Login request timed out. Please check your network connection.");
       }
-
-      // Offline / Render cold-start sleeping fallback:
-      // Allow instant access if master administrator credentials match
-      const isMasterAdmin =
-        (normId === "admin" ||
-          normId === "admin@trinexsystems.in" ||
-          normId === "admin@trinexsystem.in" ||
-          normId === "admin@trinexsystems.com" ||
-          normId.startsWith("admin@")) &&
-        (normPw === "admin@trinex2026");
-
-      if (isMasterAdmin) {
-        const fallbackUser = {
-          email: normId.includes("@") ? normId : "admin@trinexsystems.in",
-          username: "admin",
-          role: "admin",
-          name: "Trinex Administrator",
-        };
-        const offlineToken = `trinex-offline-auth-${Date.now()}`;
-        setAuthSession(offlineToken, fallbackUser, rememberMe);
-        window.dispatchEvent(new Event("auth-changed"));
-        return { success: true, token: offlineToken, user: fallbackUser };
-      }
-
-      throw new Error(err.message || "Unable to reach server. Please check connection and try again.");
+      throw err;
     }
   },
 
@@ -764,12 +377,6 @@ export const api = {
     const token = getAuthToken();
     if (!token) {
       return { authenticated: false, user: null };
-    }
-    if (token.startsWith("trinex-offline-auth-")) {
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        return { authenticated: true, user: currentUser };
-      }
     }
     try {
       const res = await fetch(`${API_BASE}/auth/verify`, {
@@ -789,8 +396,7 @@ export const api = {
         return { authenticated: false, user: null };
       }
     } catch (err) {
-      console.warn("Auth verify network check failed:", err);
-      // In offline / network glitch fallback, keep existing session if cached user exists
+      console.warn("Auth verify network check failed:", err.message);
       const currentUser = getCurrentUser();
       if (currentUser) {
         return { authenticated: true, user: currentUser };

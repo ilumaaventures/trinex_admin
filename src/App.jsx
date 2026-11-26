@@ -377,8 +377,13 @@ export default function App() {
     try {
       const refreshedCats = await api.getCategories();
       if (Array.isArray(refreshedCats)) setCategories(refreshedCats);
-      const refreshedProds = await api.getProducts();
-      if (Array.isArray(refreshedProds)) setProducts(refreshedProds);
+      const res = await api.getProducts(buildQueryParams(1));
+      if (Array.isArray(res)) {
+        setProducts(res);
+        setPage(1);
+        setHasMore(Boolean(res.pagination?.hasNextPage));
+        setTotalCount(res.pagination?.totalItems ?? res.length);
+      }
       setToastMessage(`Category "${updatedCat.name || updatedCat.id}" updated successfully.`);
     } catch (err) {
       console.error("Error refreshing categories/products:", err);
@@ -389,9 +394,15 @@ export default function App() {
     try {
       const refreshedCats = await api.getCategories();
       if (Array.isArray(refreshedCats)) setCategories(refreshedCats);
-      const refreshedProds = await api.getProducts();
-      if (Array.isArray(refreshedProds)) setProducts(refreshedProds);
+      const nextCat = selectedCategory === id ? "all" : selectedCategory;
       if (selectedCategory === id) setSelectedCategory("all");
+      const res = await api.getProducts(buildQueryParams(1, { category: nextCat }));
+      if (Array.isArray(res)) {
+        setProducts(res);
+        setPage(1);
+        setHasMore(Boolean(res.pagination?.hasNextPage));
+        setTotalCount(res.pagination?.totalItems ?? res.length);
+      }
       setToastMessage(`Category "${catName}" removed successfully.`);
     } catch (err) {
       console.error("Error refreshing categories:", err);
@@ -404,15 +415,19 @@ export default function App() {
         "Reset the entire inventory back to factory defaults? Custom items will be replaced."
       )
     ) {
-      await api.resetCatalog();
-      const res = await api.getProducts(buildQueryParams(1));
-      setProducts(res);
-      setPage(1);
-      setHasMore(Boolean(res.pagination?.hasNextPage));
-      setTotalCount(res.pagination?.totalItems || res.length);
-      const refreshedCats = await api.getCategories();
-      if (Array.isArray(refreshedCats) && refreshedCats.length > 0) setCategories(refreshedCats);
-      setToastMessage("Catalog restored to factory defaults.");
+      try {
+        await api.resetCatalog();
+        const res = await api.getProducts(buildQueryParams(1));
+        setProducts(res);
+        setPage(1);
+        setHasMore(Boolean(res.pagination?.hasNextPage));
+        setTotalCount(res.pagination?.totalItems || res.length);
+        const refreshedCats = await api.getCategories();
+        if (Array.isArray(refreshedCats) && refreshedCats.length > 0) setCategories(refreshedCats);
+        setToastMessage("Catalog restored to factory defaults.");
+      } catch (err) {
+        setToastMessage(`Error: ${err.message || "Failed to reset catalog."}`);
+      }
     }
   };
 
@@ -691,7 +706,7 @@ export default function App() {
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <button
                 type="button"
-                onClick={() => setIsCategoryModalOpen(true)}
+                onClick={handleOpenCreateCategory}
                 className="px-3.5 py-2.5 bg-[#345B43] hover:bg-[#345B43] text-[#6F966B] border border-[#6F966B] text-xs font-sans font-semibold uppercase tracking-wider rounded-[2px] transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
               >
                 <TechnicalIcon name="folder-plus" className="w-4 h-4 text-[#6F966B]" />
@@ -777,10 +792,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 cursor - pointer ${viewMode === "table"
+                  className={`p-1.5 cursor-pointer ${viewMode === "table"
                     ? "bg-[#345B43] text-[#6F966B]"
                     : "bg-white text-[#66756A]"
-                    } `}
+                    }`}
                   title="Table view"
                 >
                   <TechnicalIcon name="layers" className="w-3.5 h-3.5" />
@@ -788,10 +803,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setViewMode("cards")}
-                  className={`p - 1.5 cursor - pointer ${viewMode === "cards"
+                  className={`p-1.5 cursor-pointer ${viewMode === "cards"
                     ? "bg-[#345B43] text-[#6F966B]"
                     : "bg-white text-[#66756A]"
-                    } `}
+                    }`}
                   title="Card grid view"
                 >
                   <TechnicalIcon name="grid" className="w-3.5 h-3.5" />
@@ -847,7 +862,7 @@ export default function App() {
 
       {/* 4. Product Editor Modal with full SEO suite */}
       <ProductEditorModal
-        key={editingProduct ? `edit - ${editingProduct.id} ` : (isEditorOpen ? "new-product" : "closed")}
+        key={editingProduct ? `edit-${editingProduct.id || editingProduct._id}` : (isEditorOpen ? "new-product" : "closed")}
         isOpen={isEditorOpen}
         product={editingProduct}
         categories={categories}

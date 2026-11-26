@@ -253,7 +253,7 @@ export function ProductEditorModal({
             </div>
             <div>
               <h2 className="text-base font-heading font-extrabold tracking-wide uppercase">
-                {product?.id ? "Edit Product & SEO Metadata" : "Add New Product with SEO Suite"}
+                {product?.id || product?._id ? "Edit Product & SEO Metadata" : "Add New Product with SEO Suite"}
               </h2>
               <p className="text-[11px] text-white/70 font-sans">
                 SUBDOMAIN ENGINE &bull; admin.trinexsystems.com
@@ -749,7 +749,7 @@ export function ProductEditorModal({
                 CANCEL
               </Button>
               <Button variant="primary" type="submit">
-                {product?.id ? "SAVE & UPDATE SEO" : "PUBLISH PRODUCT"}
+                {product?.id || product?._id ? "SAVE & UPDATE SEO" : "PUBLISH PRODUCT"}
               </Button>
             </div>
           </div>
