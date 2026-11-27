@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { TechnicalIcon } from "../ui/TechnicalIcon";
 
 export function ProductTable({ products, categories = [], onEdit, onDelete, onToggleVisibility }) {
@@ -180,7 +180,7 @@ export function ProductTable({ products, categories = [], onEdit, onDelete, onTo
       </div>
       <div className="bg-[#F5F8F4] border-t border-[#E2EAE0] px-4 py-2.5 flex items-center justify-between text-xs text-[#66756A] font-sans font-medium">
         <span>Showing {products.length} products registered</span>
-        <span>admin.trinexsystems.com Subdomain Engine</span>
+        <span>admin.trinexsystems.in Subdomain Engine</span>
       </div>
     </div>
   );
